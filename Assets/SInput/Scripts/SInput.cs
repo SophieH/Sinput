@@ -392,7 +392,7 @@ public static class Sinput {
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad5)) return InputDeviceSlot.gamepad5;
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad6)) return InputDeviceSlot.gamepad6;
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad7)) return InputDeviceSlot.gamepad7;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad7)) return InputDeviceSlot.gamepad7;
+		if (GetButtonDown(controlName, InputDeviceSlot.gamepad8)) return InputDeviceSlot.gamepad8;
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad9)) return InputDeviceSlot.gamepad9;
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad10)) return InputDeviceSlot.gamepad10;
 		if (GetButtonDown(controlName, InputDeviceSlot.gamepad11)) return InputDeviceSlot.gamepad11;
