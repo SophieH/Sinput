@@ -1,0 +1,343 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d42286b245743bfbb10bfa223892e5, type: 3}
+  m_Name: openVR_win
+  m_EditorClassIdentifier: 
+  names:
+  - OPENVR CONTROLLER(VIVE CONTROLLER MV) - LEFT
+  - OPENVR CONTROLLER(VIVE CONTROLLER MV) - RIGHT
+  partialNames:
+  - OpenVR
+  isDefault: 0
+  os: 2
+  buttons:
+  - buttonType: 23
+    vrButtonType: 1
+    buttonNumber: 2
+    displayName: Menu (Left)
+  - buttonType: 23
+    vrButtonType: 2
+    buttonNumber: 0
+    displayName: Menu (Right)
+  - buttonType: 24
+    vrButtonType: 3
+    buttonNumber: 3
+    displayName: Outer Face Button (Left)
+  - buttonType: 24
+    vrButtonType: 4
+    buttonNumber: 1
+    displayName: Outer Face Button (Right)
+  - buttonType: 9
+    vrButtonType: 5
+    buttonNumber: 8
+    displayName: Trackpad Press (Left)
+  - buttonType: 10
+    vrButtonType: 6
+    buttonNumber: 9
+    displayName: Trackpad Press (Right)
+  - buttonType: 1
+    vrButtonType: 7
+    buttonNumber: 16
+    displayName: Trackpad Touch (Left)
+  - buttonType: 2
+    vrButtonType: 8
+    buttonNumber: 17
+    displayName: Trackpad Touch (Right)
+  axis:
+  - buttonType: 15
+    vrButtonType: 9
+    axisNumber: 1
+    invert: 1
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Left
+  - buttonType: 16
+    vrButtonType: 10
+    axisNumber: 1
+    invert: 0
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Right
+  - buttonType: 26
+    vrButtonType: 21
+    axisNumber: 1
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Horizontal
+  - buttonType: 17
+    vrButtonType: 11
+    axisNumber: 2
+    invert: 1
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Up
+  - buttonType: 18
+    vrButtonType: 12
+    axisNumber: 2
+    invert: 0
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Down
+  - buttonType: 27
+    vrButtonType: 22
+    axisNumber: 2
+    invert: 1
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Left) Vertical
+  - buttonType: 19
+    vrButtonType: 13
+    axisNumber: 4
+    invert: 1
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Left
+  - buttonType: 20
+    vrButtonType: 14
+    axisNumber: 4
+    invert: 0
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Right
+  - buttonType: 28
+    vrButtonType: 23
+    axisNumber: 4
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Horizontal
+  - buttonType: 21
+    vrButtonType: 15
+    axisNumber: 5
+    invert: 1
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Up
+  - buttonType: 22
+    vrButtonType: 16
+    axisNumber: 5
+    invert: 0
+    clamp: 1
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Down
+  - buttonType: 29
+    vrButtonType: 24
+    axisNumber: 5
+    invert: 1
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trackpad (Right) Vertical
+  - buttonType: 7
+    vrButtonType: 17
+    axisNumber: 9
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trigger (Left)
+  - buttonType: 8
+    vrButtonType: 18
+    axisNumber: 10
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Trigger (Right)
+  - buttonType: 5
+    vrButtonType: 19
+    axisNumber: 11
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Grip (Left)
+  - buttonType: 6
+    vrButtonType: 20
+    axisNumber: 12
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Grip (Right)
+  - buttonType: 1
+    vrButtonType: 25
+    axisNumber: 20
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Index cap (Left)
+  - buttonType: 14
+    vrButtonType: 26
+    axisNumber: 21
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Index cap (Right)
+  - buttonType: 2
+    vrButtonType: 27
+    axisNumber: 22
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Middle cap (Left)
+  - buttonType: 12
+    vrButtonType: 28
+    axisNumber: 23
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Middle cap (Right)
+  - buttonType: 3
+    vrButtonType: 29
+    axisNumber: 24
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Ring cap (Left)
+  - buttonType: 11
+    vrButtonType: 30
+    axisNumber: 25
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Ring cap (Right)
+  - buttonType: 4
+    vrButtonType: 31
+    axisNumber: 26
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Pinky cap (Left)
+  - buttonType: 13
+    vrButtonType: 32
+    axisNumber: 27
+    invert: 0
+    clamp: 0
+    compareGreater: 1
+    compareVal: 0.4
+    rescaleAxis: 0
+    rescaleAxisMin: 0
+    rescaleAxisMax: 1
+    defaultVal: 0
+    displayName: Pinky cap (Right)
+  isXRdevice: 1
