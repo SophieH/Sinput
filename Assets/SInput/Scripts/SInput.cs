@@ -42,8 +42,6 @@ public static class Sinput {
 	/// </summary>
 	public static Control[] controls {
 		get {
-			Init();
-
 			//make a copy of the controls so we're definitely not returning something that will effect _controls
 			Control[] returnControlList = new Control[_controls.Length];
 			for (int i = 0; i < _controls.Length; i++) {
@@ -64,9 +62,7 @@ public static class Sinput {
 	}
 
 	private static SmartControl[] _smartControls;
-	public static SmartControl[] smartControls {
-		get { Init(); return _smartControls; }
-	}
+	public static SmartControl[] smartControls { get { return _smartControls; } }
 
 	//gamepads list is checked every GetButton/GetAxis call, when it updates all common mapped inputs are reapplied appropriately
 	static int nextGamepadCheck=-99;
@@ -90,11 +86,9 @@ public static class Sinput {
 	}
 
 	//init
-	private static bool initialised = false;
+	[RuntimeInitializeOnLoadMethod]
 	static void Init(){
-		//Debug.Log("init!");
-		if (initialised) return;
-		initialised = true;
+		Debug.Log("Initializing SInput");
 
 		totalPossibleDeviceSlots = System.Enum.GetValues(typeof(InputDeviceSlot)).Length;
 
@@ -114,7 +108,6 @@ public static class Sinput {
 	public static void LoadControlScheme(string schemeName, bool loadCustomControls) {
 		schemeLoaded = false;
 		//Debug.Log("load scheme name!");
-		Init();
 		UnityEngine.Object[] projectControlSchemes = Resources.LoadAll("", typeof(ControlScheme));
 
 		int schemeIndex = -1;
@@ -138,8 +131,6 @@ public static class Sinput {
 
 		schemeLoaded = false;
 
-
-		Init();
 
 		//make sure we know what gamepads are connected
 		//and load their common mappings if they are needed
@@ -217,9 +208,6 @@ public static class Sinput {
 		if (lastUpdateFrame == Time.frameCount) return;
 
 		lastUpdateFrame = Time.frameCount;
-
-		//make sure everything is set up
-		Init();
 
 		if (!schemeLoaded) LoadControlScheme("MainControlScheme", true);
 
@@ -301,8 +289,6 @@ public static class Sinput {
 		lastCheckedGamepadRefreshFrame = Time.frameCount;
 
 		//Debug.Log("checking gamepads");
-
-		Init();
 
 		var tempInputGamepads = Input.GetJoystickNames();
 		if (connectedGamepads != tempInputGamepads.Length) refreshGamepadsNow = true; //number of connected gamepads has changed
