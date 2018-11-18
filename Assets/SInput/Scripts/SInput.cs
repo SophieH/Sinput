@@ -1,4 +1,3 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -408,84 +407,30 @@ public static class Sinput {
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButton(string controlName){ return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.HELD); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control is Held this frame
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButton(string controlName, InputDeviceSlot slot){ return ButtonCheck(controlName, slot, ButtonAction.HELD); }
+	public static bool GetButton(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.HELD); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButtonDown(string controlName){ return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.DOWN); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Pressed this frame
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButtonDown(string controlName, InputDeviceSlot slot){ return ButtonCheck(controlName, slot, ButtonAction.DOWN); }
+	public static bool GetButtonDown(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.DOWN); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButtonUp(string controlName){ return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.UP); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Released this frame
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButtonUp(string controlName, InputDeviceSlot slot){ return ButtonCheck(controlName, slot, ButtonAction.UP); }
+	public static bool GetButtonUp(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.UP); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButtonRaw(string controlName) { return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.HELD, true); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control is Held this frame, regardless of the Control's toggle setting.
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButtonRaw(string controlName, InputDeviceSlot slot) { return ButtonCheck(controlName, slot, ButtonAction.HELD, true); }
+	public static bool GetButtonRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.HELD, true); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButtonDownRaw(string controlName) { return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.DOWN, true); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, regardless of the Control's toggle setting.
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButtonDownRaw(string controlName, InputDeviceSlot slot) { return ButtonCheck(controlName, slot, ButtonAction.DOWN, true); }
+	public static bool GetButtonDownRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.DOWN, true); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool GetButtonUpRaw(string controlName) { return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.UP, true); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Released this frame, regardless of the Control's toggle setting.
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static bool GetButtonUpRaw(string controlName, InputDeviceSlot slot) { return ButtonCheck(controlName, slot, ButtonAction.UP, true); }
+	public static bool GetButtonUpRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.UP, true); }
 
 	//repeating button checks
 	/// <summary>
@@ -500,16 +445,11 @@ public static class Sinput {
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
 	/// <para>Use this for menu scrolling inputs</para>
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
 	public static bool GetButtonDownRepeating(string controlName) { return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.REPEATING); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
 	/// <para>Use this for menu scrolling inputs</para>
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
 	public static bool GetButtonDownRepeating(string controlName, InputDeviceSlot slot) { return ButtonCheck(controlName, slot, ButtonAction.REPEATING); }
 
 	static bool ButtonCheck(string controlName, InputDeviceSlot slot, ButtonAction bAction, bool getRawValue = false){
@@ -546,31 +486,17 @@ public static class Sinput {
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns>float value</returns>
 	public static float GetAxis(string controlName) { return AxisCheck(controlName, InputDeviceSlot.any); }
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static float GetAxis(string controlName, InputDeviceSlot slot ) { return AxisCheck(controlName, slot); }
+	public static float GetAxis(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return AxisCheck(controlName, slot); }
 
 
 	/// <summary>
 	/// Returns the raw value of a Sinput Control or Smart Control
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static float GetAxisRaw(string controlName) { return AxisCheck(controlName, InputDeviceSlot.any, true); }
-	/// <summary>
-	/// Returns the raw value of a Sinput Control or Smart Control
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
-	public static float GetAxisRaw(string controlName, InputDeviceSlot slot) { return AxisCheck(controlName, slot, true); }
+	public static float GetAxisRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return AxisCheck(controlName, slot, true); }
 
 	static float AxisCheck(string controlName, InputDeviceSlot slot, bool getRawValue=false){
 
@@ -608,29 +534,16 @@ public static class Sinput {
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
 	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB) { return Vector2Check(controlNameA, controlNameB, InputDeviceSlot.any, true); }
+	public static Vector2 GetVector(string controlNameA, string controlNameB, bool normalClip = true) { return Vector2Check(controlNameA, controlNameB, InputDeviceSlot.any, normalClip); }
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
-	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, bool normalClip) { return Vector2Check(controlNameA, controlNameB, InputDeviceSlot.any, normalClip); }
-	/// <summary>
-	/// Returns a Vector2 made with GetAxis() values applied to x and y
-	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
 	/// <returns></returns>
 	public static Vector2 GetVector(string controlNameA, string controlNameB, InputDeviceSlot slot) { return Vector2Check(controlNameA, controlNameB, slot, true); }
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
 	/// <returns></returns>
 	public static Vector2 GetVector(string controlNameA, string controlNameB, InputDeviceSlot slot, bool normalClip) { return Vector2Check(controlNameA, controlNameB, slot, normalClip); }
 
@@ -653,30 +566,14 @@ public static class Sinput {
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
-	/// <returns></returns>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC) { return Vector3Check(controlNameA, controlNameB, controlNameC, InputDeviceSlot.any, true); }
+	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, bool normalClip = true) { return Vector3Check(controlNameA, controlNameB, controlNameC, InputDeviceSlot.any, true); }
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
-	/// <returns></returns>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, bool normalClip) { return Vector3Check(controlNameA, controlNameB, controlNameC, InputDeviceSlot.any, normalClip); }
-	/// <summary>
-	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
-	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
-	/// <returns></returns>
 	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, true); }
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	/// <param name="controlNameA"></param>
-	/// <param name="controlNameB"></param>
-	/// <returns></returns>
 	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot, bool normalClip) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, normalClip); }
 
 	static Vector3 Vector3Check(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot, bool normalClip){
@@ -701,16 +598,7 @@ public static class Sinput {
 	/// Returns false if the value returned by GetAxis(controlName) on this frame should NOT be multiplied by delta time.
 	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool PrefersDeltaUse(string controlName) { return PrefersDeltaUse(controlName, InputDeviceSlot.any); }
-	/// <summary>
-	/// Returns false if the value returned by GetAxis(controlName, slot) on this frame should NOT be multiplied by delta time.
-	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
-	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
-	public static bool PrefersDeltaUse(string controlName, InputDeviceSlot slot) {
+	public static bool PrefersDeltaUse(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) {
 
 		SinputUpdate();
 
@@ -753,8 +641,6 @@ public static class Sinput {
 	/// <summary>
 	/// sets whether a control treats GetButton() calls with press or with toggle behaviour
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <param name="toggle"></param>
 	public static void SetToggle(string controlName, bool toggle) {
 		SinputUpdate();
 		controlFound = false;
@@ -770,8 +656,6 @@ public static class Sinput {
 	/// <summary>
 	/// returns true if a control treats GetButton() calls with toggle behaviour
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
 	public static bool GetToggle(string controlName) {
 		SinputUpdate();
 		for (int i = 0; i < _controls.Length; i++) {
@@ -787,9 +671,6 @@ public static class Sinput {
 	/// <summary>
 	/// set a smart control to be inverted or not
 	/// </summary>
-	/// <param name="smartControlName"></param>
-	/// <param name="invert"></param>
-	/// <param name="slot"></param>
 	public static void SetInverted(string smartControlName, bool invert, InputDeviceSlot slot=InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
@@ -811,9 +692,6 @@ public static class Sinput {
 	/// <summary>
 	/// returns true if a smart control is inverted
 	/// </summary>
-	/// <param name="smartControlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
 	public static bool GetInverted(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
 		SinputUpdate();
 		for (int i = 0; i < _smartControls.Length; i++) {
@@ -829,9 +707,6 @@ public static class Sinput {
 	/// <summary>
 	/// sets scale ("sensitivity") of a smart control
 	/// </summary>
-	/// <param name="smartControlName"></param>
-	/// <param name="scale"></param>
-	/// <param name="slot"></param>
 	public static void SetScale(string smartControlName, float scale, InputDeviceSlot slot = InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
@@ -853,9 +728,6 @@ public static class Sinput {
 	/// <summary>
 	/// gets scale of a smart control
 	/// </summary>
-	/// <param name="smartControlName"></param>
-	/// <param name="slot"></param>
-	/// <returns></returns>
 	public static float GetScale(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
 		for (int i = 0; i < _smartControls.Length; i++) {
 			if (_smartControls[i].name == smartControlName) {
