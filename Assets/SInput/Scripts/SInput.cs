@@ -107,7 +107,7 @@ public static class Sinput {
 	public static void LoadControlScheme(string schemeName, bool loadCustomControls) {
 		schemeLoaded = false;
 		//Debug.Log("load scheme name!");
-		UnityEngine.Object[] projectControlSchemes = Resources.LoadAll("", typeof(SinputSystems.ControlScheme));
+		var projectControlSchemes = Resources.LoadAll<SinputSystems.ControlScheme>("");
 
 		int schemeIndex = -1;
 		for (int i=0; i<projectControlSchemes.Length; i++){
@@ -118,7 +118,7 @@ public static class Sinput {
 			return;
 		}
 		//controlScheme = (ControlScheme)projectControlSchemes[schemeIndex];
-		LoadControlScheme((SinputSystems.ControlScheme)projectControlSchemes[schemeIndex], loadCustomControls);
+		LoadControlScheme(projectControlSchemes[schemeIndex], loadCustomControls);
 	}
 	/// <summary>
 	/// Load a Control Scheme.

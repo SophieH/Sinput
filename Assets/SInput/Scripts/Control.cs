@@ -241,14 +241,14 @@ namespace SinputSystems{
 			//find which common mapped inputs apply here, but already have custom binding loaded, and disregard those common mappings
 			for (int ai=0; ai<applicableMapInputs.Count; ai++){
 				bool samePad = false;
-				for (int i=0; i<inputs.Count; i++){
-					if (inputs[i].inputType == InputDeviceType.GamepadAxis || inputs[i].inputType == InputDeviceType.GamepadButton){
-						if (inputs[i].isCustom){
+				foreach (var input in inputs){
+					if (input.inputType == InputDeviceType.GamepadAxis || input.inputType == InputDeviceType.GamepadButton){
+						if (input.isCustom){
 							for (int ais=0; ais<applicableMapInputs[ai].allowedSlots.Length; ais++){
-								for (int toomanyints=0; toomanyints<inputs[i].allowedSlots.Length; toomanyints++){
-									if (applicableMapInputs[ai].allowedSlots[ais] == inputs[i].allowedSlots[toomanyints]) samePad = true;
+								for (int toomanyints=0; toomanyints<input.allowedSlots.Length; toomanyints++){
+									if (applicableMapInputs[ai].allowedSlots[ais] == input.allowedSlots[toomanyints]) samePad = true;
 								}
-								if (gamepads[applicableMapInputs[ai].allowedSlots[ais]] == inputs[i].deviceName.ToUpper()) samePad = true;
+								if (gamepads[applicableMapInputs[ai].allowedSlots[ais]] == input.deviceName.ToUpper()) samePad = true;
 							}
 							if (samePad){
 								//if I wanna be copying input display names, here's the place to do it
