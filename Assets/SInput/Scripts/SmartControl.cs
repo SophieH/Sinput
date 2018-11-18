@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SinputSystems{
@@ -149,7 +150,7 @@ namespace SinputSystems{
 			if (!prefersDeltaUse) return rawValues[(int)slot] * scales[(int)slot];
 
 			//deadzone clipping
-			if (Mathf.Abs(controlValues[(int)slot]) < deadzone) return 0f;
+			if (Math.Abs(controlValues[(int)slot]) < deadzone) return 0f;
 
 			if (getRawValue) {
 				//return the raw value

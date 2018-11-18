@@ -513,7 +513,7 @@ public static class Sinput {
 				controlFound=true;
 				bool prefersDeltaUseTmp;
 				var v = _controls[i].GetAxisState(slot, out prefersDeltaUseTmp);
-				if (Mathf.Abs(v) > returnV) {
+				if (Math.Abs(v) > returnV) {
 					prefersDeltaUse = prefersDeltaUseTmp;
 					returnV = v;
 				}
@@ -525,7 +525,7 @@ public static class Sinput {
 				controlFound=true;
 				bool prefersDeltaUseTmp;
 				var v = smartControls[i].GetValue(slot, getRawValue, out prefersDeltaUseTmp);
-				if (Mathf.Abs(v) > returnV) {
+				if (Math.Abs(v) > returnV) {
 					prefersDeltaUse = prefersDeltaUseTmp;
 					returnV = v;
 				}
@@ -608,7 +608,7 @@ public static class Sinput {
 				controlFound = true;
 				bool tmpPreferDelta;
 				var v = _controls[i].GetAxisState(slot, out tmpPreferDelta);
-				if (Mathf.Abs(v) > returnV) {
+				if (Math.Abs(v) > returnV) {
 					returnV = v;
 					preferDelta = tmpPreferDelta;
 				}
@@ -621,7 +621,7 @@ public static class Sinput {
 				controlFound = true;
 				bool tmpPreferDelta;
 				var v = smartControls[i].GetValue(slot, true, out tmpPreferDelta);
-				if (Mathf.Abs(v) > returnV) {
+				if (Math.Abs(v) > returnV) {
 					returnV = v;
 					preferDelta = tmpPreferDelta;
 				}

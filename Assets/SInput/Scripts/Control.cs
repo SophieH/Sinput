@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -77,13 +78,13 @@ namespace SinputSystems{
 
 				//update axis-as-button state
 				if (input.inputType == InputDeviceType.GamepadAxis) {
-					if (v > input.axisButtoncompareVal) controlState.axisAsButtonHeld = true;
+					controlState.axisAsButtonHeld |= v > input.axisButtoncompareVal;
 				}
 				else if (input.inputType == InputDeviceType.Mouse) {
-					if (Mathf.Abs(v) > 0.5f) controlState.axisAsButtonHeld = true;
+					controlState.axisAsButtonHeld |= Math.Abs(v) > 0.5f;
 				}
 
-				if (Mathf.Abs(v) > controlState.value) {
+				if (Math.Abs(v) > controlState.value) {
 					//this is the value we're going with
 					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime
@@ -115,7 +116,7 @@ namespace SinputSystems{
 			for (int i = 1; i < controlStates.Length; i++) {
 				var v = controlStates[i].value;
 
-				if (Mathf.Abs(v) > controlState.value) {
+				if (Math.Abs(v) > controlState.value) {
 					//this is the value we're going with
 					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SinputSystems{
@@ -171,7 +172,7 @@ namespace SinputSystems{
 				if (slot == InputDeviceSlot.any){
 					float greatestV = 0f;
 					for (int i=1; i<=Sinput.connectedGamepads; i++){
-						greatestV = Mathf.Max(greatestV, Mathf.Abs( AxisCheck((InputDeviceSlot)i) ));
+						greatestV = Math.Max(greatestV, Math.Abs( AxisCheck((InputDeviceSlot)i) ));
 					}
 					return greatestV;
 				}
@@ -241,32 +242,32 @@ namespace SinputSystems{
 				if (slot != InputDeviceSlot.any && slot != InputDeviceSlot.mouse && slot != InputDeviceSlot.keyboardAndMouse) return 0f;
 
 				switch (mouseInputType){
-				case MouseInputType.MouseHorizontal:
-					return Input.GetAxisRaw("Mouse Horizontal")*Sinput.mouseSensitivity;
-				case MouseInputType.MouseMoveLeft:
-					return Mathf.Min(Input.GetAxisRaw("Mouse Horizontal") * Sinput.mouseSensitivity, 0f) * -1f;
-				case MouseInputType.MouseMoveRight:
-					return Mathf.Max(Input.GetAxisRaw("Mouse Horizontal") * Sinput.mouseSensitivity, 0f);
-				case MouseInputType.MouseMoveUp:
-					return Mathf.Max(Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity, 0f);
-				case MouseInputType.MouseMoveDown:
-					return Mathf.Min(Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity, 0f) * -1f;
-				case MouseInputType.MouseVertical:
-					return Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity;
-				case MouseInputType.MouseScroll:
-					return Input.GetAxisRaw("Mouse Scroll");
-				case MouseInputType.MouseScrollUp:
-					return Mathf.Max(Input.GetAxisRaw("Mouse Scroll"), 0f);
-				case MouseInputType.MouseScrollDown:
-					return Mathf.Min(Input.GetAxisRaw("Mouse Scroll"), 0f) * -1f;
-				case MouseInputType.MousePositionX:
-					return Input.mousePosition.x;
-				case MouseInputType.MousePositionY:
-					return Input.mousePosition.y;
-				default:
-					//it's a click type mouse input
-					if (Input.GetKey(SInputEnums.GetMouseButton(mouseInputType))) return 1f;
-					break;
+					case MouseInputType.MouseHorizontal:
+						return Input.GetAxisRaw("Mouse Horizontal") * Sinput.mouseSensitivity;
+					case MouseInputType.MouseMoveLeft:
+						return Math.Min(Input.GetAxisRaw("Mouse Horizontal") * Sinput.mouseSensitivity, 0f) * -1f;
+					case MouseInputType.MouseMoveRight:
+						return Math.Max(Input.GetAxisRaw("Mouse Horizontal") * Sinput.mouseSensitivity, 0f);
+					case MouseInputType.MouseMoveUp:
+						return Math.Max(Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity, 0f);
+					case MouseInputType.MouseMoveDown:
+						return Math.Min(Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity, 0f) * -1f;
+					case MouseInputType.MouseVertical:
+						return Input.GetAxisRaw("Mouse Vertical") * Sinput.mouseSensitivity;
+					case MouseInputType.MouseScroll:
+						return Input.GetAxisRaw("Mouse Scroll");
+					case MouseInputType.MouseScrollUp:
+						return Math.Max(Input.GetAxisRaw("Mouse Scroll"), 0f);
+					case MouseInputType.MouseScrollDown:
+						return Math.Min(Input.GetAxisRaw("Mouse Scroll"), 0f) * -1f;
+					case MouseInputType.MousePositionX:
+						return Input.mousePosition.x;
+					case MouseInputType.MousePositionY:
+						return Input.mousePosition.y;
+					default:
+						//it's a click type mouse input
+						if (Input.GetKey(SInputEnums.GetMouseButton(mouseInputType))) return 1f;
+						break;
 				}
 				//return Input.GetAxisRaw(mouseAxis);
 			}
