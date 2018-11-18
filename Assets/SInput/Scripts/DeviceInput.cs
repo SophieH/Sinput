@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems{
@@ -104,9 +102,7 @@ namespace SinputSystems{
 				//gamepad button check
 				if (inputType == InputDeviceType.GamepadButton){
 					//get the keycode for the gamepad's slot/button
-					string buttonString = string.Format("Joystick{0}Button{1}", (slotIndex+1), gamepadButtonNumber);
-					if (string.IsNullOrEmpty(buttonString)) return false;
-					UnityGamepadKeyCode keyCode = (UnityGamepadKeyCode)System.Enum.Parse(typeof(UnityGamepadKeyCode), buttonString);
+					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
 
 					//button check now
 					if (Input.GetKey((KeyCode)(int)keyCode)) return true;
@@ -208,9 +204,7 @@ namespace SinputSystems{
 
 				//button as axis checks
 				if (inputType == InputDeviceType.GamepadButton){
-					string buttonString = string.Format("Joystick{0}Button{1}", (slotIndex+1), gamepadButtonNumber);
-					if (string.IsNullOrEmpty(buttonString)) return 0f;
-					UnityGamepadKeyCode keyCode = (UnityGamepadKeyCode)System.Enum.Parse(typeof(UnityGamepadKeyCode), buttonString);
+					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
 
 					//button check now
 					if (Input.GetKey( (KeyCode)(int)keyCode )) return 1f;
@@ -283,7 +277,7 @@ namespace SinputSystems{
 					return Input.mousePosition.y;
 				default:
 					//it's a click type mouse input
-					if (Input.GetKey( (KeyCode)(System.Enum.Parse(typeof(KeyCode),mouseInputType.ToString())) )) return 1f;
+					if (Input.GetKey(SInputEnums.GetMouseButton(mouseInputType))) return 1f;
 					break;
 				}
 				//return Input.GetAxisRaw(mouseAxis);
