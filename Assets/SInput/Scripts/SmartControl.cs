@@ -82,15 +82,12 @@ namespace SinputSystems{
 			
 			for (int slot=0; slot<rawValues.Length; slot++){
 				
-				rawValues[slot] = Sinput.GetAxis(positiveControl, (InputDeviceSlot)slot) - Sinput.GetAxis(negativeControl, (InputDeviceSlot)slot);
+				rawValues[slot] = Sinput.GetAxis(positiveControlHashed, (InputDeviceSlot)slot) - Sinput.GetAxis(negativeControlHashed, (InputDeviceSlot)slot);
 
 				if (inversion[slot]) rawValues[slot] *= -1f;
 
-				valuePrefersDeltaUse[slot] = true;
-				if (!Sinput.PrefersDeltaUse(positiveControl, (InputDeviceSlot)slot) || !Sinput.PrefersDeltaUse(negativeControl, (InputDeviceSlot)slot)) {
-					//the rawvalue this frame is from a framerate independent input like a mouse movement, so we don't want it smoothed and wanna force getAxis checks to return raw
-					valuePrefersDeltaUse[slot] = false;
-				}
+				//Is the rawvalue this frame is from a framerate independent input like a mouse movement? if so, we don't want it smoothed and wanna force getAxis checks to return raw
+				valuePrefersDeltaUse[slot] = Sinput.PrefersDeltaUse(positiveControlHashed, (InputDeviceSlot)slot) && Sinput.PrefersDeltaUse(negativeControlHashed, (InputDeviceSlot)slot);
 			}
 
 			for (int slot=0; slot<controlValues.Length; slot++){

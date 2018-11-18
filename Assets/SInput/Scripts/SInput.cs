@@ -618,7 +618,7 @@ public static class Sinput {
 				if (Mathf.Abs(v) > returnV) {
 					returnV = v;
 
-					if (!PrefersDeltaUse(smartControls[i].positiveControl, slot) || !PrefersDeltaUse(smartControls[i].negativeControl, slot)) preferDelta = false;
+					preferDelta &= PrefersDeltaUse(smartControls[i].positiveControlHashed, slot) && PrefersDeltaUse(smartControls[i].negativeControlHashed, slot);
 				}
 			}
 		}
