@@ -70,7 +70,6 @@ namespace SinputSystems{
 			if (inputType == InputDeviceType.Keyboard){
 				if (slot == InputDeviceSlot.any || slot == InputDeviceSlot.keyboard || slot == InputDeviceSlot.keyboardAndMouse){
 					if (Input.GetKey    ( keyboardKeyCode )) return true;
-					if (Input.GetKeyDown( keyboardKeyCode )) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( keyboardKeyCode );
 				}
 
@@ -106,7 +105,6 @@ namespace SinputSystems{
 
 					//button check now
 					if (Input.GetKey((KeyCode)(int)keyCode)) return true;
-					if (Input.GetKeyDown( (KeyCode)(int)keyCode )) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( (KeyCode)(int)keyCode );
 				}
 
@@ -136,19 +134,10 @@ namespace SinputSystems{
 			if (inputType == InputDeviceType.Mouse){
 				if (slot != InputDeviceSlot.any && slot !=InputDeviceSlot.mouse && slot != InputDeviceSlot.keyboardAndMouse) return false;
 
-				KeyCode mouseKeyCode = KeyCode.None;
-				if (mouseInputType==MouseInputType.Mouse0) mouseKeyCode = KeyCode.Mouse0;
-				if (mouseInputType==MouseInputType.Mouse1) mouseKeyCode = KeyCode.Mouse1;
-				if (mouseInputType==MouseInputType.Mouse2) mouseKeyCode = KeyCode.Mouse2;
-				if (mouseInputType==MouseInputType.Mouse3) mouseKeyCode = KeyCode.Mouse3;
-				if (mouseInputType==MouseInputType.Mouse4) mouseKeyCode = KeyCode.Mouse4;
-				if (mouseInputType==MouseInputType.Mouse5) mouseKeyCode = KeyCode.Mouse5;
-				if (mouseInputType==MouseInputType.Mouse6) mouseKeyCode = KeyCode.Mouse6;
-
-				if (mouseKeyCode != KeyCode.None){
+				if (mouseInputType >= MouseInputType.Mouse0 && mouseInputType <= MouseInputType.Mouse6) {
+					KeyCode mouseKeyCode = KeyCode.Mouse0 + (mouseInputType - MouseInputType.Mouse0);
 					//clicky mouse input
 					if (Input.GetKey    ( mouseKeyCode )) return true;
-					if (Input.GetKeyDown( mouseKeyCode )) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( mouseKeyCode );
 				}else{
 					//mouse axis as button input
