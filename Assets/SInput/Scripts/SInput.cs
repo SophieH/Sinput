@@ -384,17 +384,10 @@ public static class Sinput {
 			if (!zeroInputs[(int)InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, InputDeviceSlot.keyboard)) return InputDeviceSlot.keyboardAndMouse;
 			if (!zeroInputs[(int)InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, InputDeviceSlot.mouse)) return InputDeviceSlot.keyboardAndMouse;
 		}
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad1)) return InputDeviceSlot.gamepad1;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad2)) return InputDeviceSlot.gamepad2;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad3)) return InputDeviceSlot.gamepad3;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad4)) return InputDeviceSlot.gamepad4;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad5)) return InputDeviceSlot.gamepad5;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad6)) return InputDeviceSlot.gamepad6;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad7)) return InputDeviceSlot.gamepad7;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad8)) return InputDeviceSlot.gamepad8;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad9)) return InputDeviceSlot.gamepad9;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad10)) return InputDeviceSlot.gamepad10;
-		if (GetButtonDown(controlName, InputDeviceSlot.gamepad11)) return InputDeviceSlot.gamepad11;
+
+		for (int i = (int) InputDeviceSlot.gamepad1; i <= (int) InputDeviceSlot.gamepad11; i++) {
+			if (GetButtonDown(controlName, (InputDeviceSlot) i)) return (InputDeviceSlot) i;
+		}
 		
 		if (GetButtonDown(controlName, InputDeviceSlot.virtual1)) return InputDeviceSlot.virtual1;
 
