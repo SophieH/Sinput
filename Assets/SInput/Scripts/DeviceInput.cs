@@ -201,8 +201,7 @@ namespace SinputSystems{
 
 				//gamepad axis check
 				if (inputType == InputDeviceType.GamepadAxis){
-					string axisString = string.Format("J_{0}_{1}", (slotIndex+1), gamepadAxisNumber);
-					float axisValue = Input.GetAxisRaw(axisString);
+					float axisValue = Input.GetAxisRaw(SInputEnums.GetAxisString(slotIndex, gamepadAxisNumber - 1));
 					if (invertAxis) axisValue*=-1f;
 					if (rescaleAxis){
 						//some gamepad axis are -1 to 1 or something when you want them as 0 to 1, EG; triggers on XBONE pad on OSX

@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 
 namespace SinputSystems{
@@ -551,11 +552,21 @@ namespace SinputSystems{
 		public static readonly KeyboardInputType[] KeyboardInputTypes = (KeyboardInputType[]) Enum.GetValues(typeof(KeyboardInputType));
 		public static readonly MouseInputType[] MouseInputTypes = (MouseInputType[]) Enum.GetValues(typeof(MouseInputType));
 
+		private static readonly string[] AxisStrings = ((Func<string[]>) (() => {
+			var strs = new string[Sinput.MAXCONNECTEDGAMEPADS * Sinput.MAXAXISPERGAMEPAD];
+			for (int j = 0; j < Sinput.MAXCONNECTEDGAMEPADS; j++) {
+				for (int a = 0; a < Sinput.MAXAXISPERGAMEPAD; a++) {
+					strs[j * Sinput.MAXAXISPERGAMEPAD + a] = string.Format("J_{0}_{1}", j + 1, a + 1);
+				}
+			}
+			return strs;
+		}))();
+
 		/// <summary>
 		/// Get the KeyCode that corresponds to a specific gamepad number and button
 		/// </summary>
-		/// <param name="slotIndex">0-index based</param>
-		/// <param name="gamepadButtonNumber">0-index based</param>
+		/// <param name="slotIndex">0-index based (starts from 0)</param>
+		/// <param name="gamepadButtonNumber">0-index based (starts from 0)</param>
 		public static KeyCode GetGamepadKeyCode(int slotIndex, int gamepadButtonNumber) {
 			const UnityGamepadKeyCode FirstButton = UnityGamepadKeyCode.Joystick1Button0;
 			const int ButtonsPerGamepad = UnityGamepadKeyCode.Joystick2Button0 - UnityGamepadKeyCode.Joystick1Button0;
@@ -571,6 +582,15 @@ namespace SinputSystems{
 			if (mouseInputType >= MouseInputType.Mouse0 && mouseInputType <= MouseInputType.Mouse6)
 				return KeyCode.Mouse0 + (mouseInputType - MouseInputType.Mouse0);
 			return KeyCode.None;
+		}
+
+		/// <summary>
+		/// Get a string that can be used with <see cref="Input.GetAxis(string)"/>
+		/// </summary>
+		/// <param name="joystick">0-index based (starts from 0)</param>
+		/// <param name="axis">0-index based (starts from 0)</param>
+		public static string GetAxisString(int joystick, int axis) {
+			return AxisStrings[joystick * Sinput.MAXAXISPERGAMEPAD + axis];
 		}
 	}
 }
