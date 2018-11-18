@@ -1,11 +1,12 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems{
-	public class Control{
+	// If this class inherits from ScriptableObject, Instantiate of this easily makes a clone
+	public class Control : ISerializationCallbackReceiver {
 		//name of control
 		public string name;
+		public int nameHashed { get; private set; }
 
 		//is this control a hold or a toggle type
 		public bool isToggle = false;
@@ -20,6 +21,14 @@ namespace SinputSystems{
 		public Control(string controlName){
 			name = controlName;
 			inputs = new List<DeviceInput>();
+			Hash();
+		}
+
+		public void OnBeforeSerialize() { }
+		public void OnAfterDeserialize() { Hash(); }
+
+		public void Hash() {
+			nameHashed = Animator.StringToHash(name);
 		}
 
 		private ControlState[] controlStates;

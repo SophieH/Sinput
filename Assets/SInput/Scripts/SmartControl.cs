@@ -1,20 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems{
 
-	public class SmartControl{
+	public class SmartControl : ISerializationCallbackReceiver {
 		//InputControls combine various inputs, and can behave as buttons or 1-dimensional axis
 		//SmartControls combine various InputControls or other SmartControls, and can have a bunch of extra behaviour like normal InputManager smoothing
 		//These won't be exposed to players when rebinding because they are built on other controls (and it'd be a headache to present anyway)
 
 		public string name;
+		public int nameHashed { get; private set; }
 		public string displayName;
 
 		//control constructor
 		public SmartControl(string controlName){
 			name = controlName;
+			Hash();
+		}
+
+		public void OnBeforeSerialize() { }
+		public void OnAfterDeserialize() { Hash(); }
+
+		public void Hash() {
+			nameHashed = Animator.StringToHash(name);
+			positiveControlHashed = Animator.StringToHash(positiveControl);
+			negativeControlHashed = Animator.StringToHash(negativeControl);
 		}
 
 		//values for each slot's input
@@ -23,7 +32,9 @@ namespace SinputSystems{
 		private bool[] valuePrefersDeltaUse;
 
 		public string positiveControl;
+		public int positiveControlHashed { get; private set; }
 		public string negativeControl;
+		public int negativeControlHashed { get; private set; }
 
 
 		public float deadzone=0.001f; //clip values less than this

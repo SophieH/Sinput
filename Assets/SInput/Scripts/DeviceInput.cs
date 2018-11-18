@@ -69,7 +69,7 @@ namespace SinputSystems{
 			//keyboard key checks
 			if (inputType == InputDeviceType.Keyboard){
 				if (slot == InputDeviceSlot.any || slot == InputDeviceSlot.keyboard || slot == InputDeviceSlot.keyboardAndMouse){
-					if (Input.GetKey    ( keyboardKeyCode )) return true;
+					if (Input.GetKey( keyboardKeyCode )) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( keyboardKeyCode );
 				}
 
@@ -77,7 +77,7 @@ namespace SinputSystems{
 			}
 
 			//gamepad button checks
-			if (inputType == InputDeviceType.GamepadButton || inputType == InputDeviceType.GamepadAxis){
+			else if (inputType == InputDeviceType.GamepadButton || inputType == InputDeviceType.GamepadAxis){
 				if (slot == InputDeviceSlot.keyboard || slot == InputDeviceSlot.mouse || slot == InputDeviceSlot.keyboardAndMouse) return false;
 
 				//if checking any slot, call this function for each possible slot
@@ -104,7 +104,7 @@ namespace SinputSystems{
 					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
 
 					//button check now
-					if (Input.GetKey((KeyCode)(int)keyCode)) return true;
+					if (Input.GetKey(keyCode)) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( (KeyCode)(int)keyCode );
 				}
 
@@ -122,7 +122,7 @@ namespace SinputSystems{
 
 
 			//virtual device input checks
-			if (inputType == InputDeviceType.Virtual){
+			else if (inputType == InputDeviceType.Virtual){
 				if (slot == InputDeviceSlot.any || slot == InputDeviceSlot.virtual1) {
 					return VirtualInputs.GetVirtualButton(virtualInputID);
 					//if (ButtonAction.HELD == virtualInputState) return true;
@@ -131,13 +131,13 @@ namespace SinputSystems{
 			}
 
 			//mouseaxis button checks (these don't happen)
-			if (inputType == InputDeviceType.Mouse){
+			else if (inputType == InputDeviceType.Mouse){
 				if (slot != InputDeviceSlot.any && slot !=InputDeviceSlot.mouse && slot != InputDeviceSlot.keyboardAndMouse) return false;
 
 				if (mouseInputType >= MouseInputType.Mouse0 && mouseInputType <= MouseInputType.Mouse6) {
 					KeyCode mouseKeyCode = KeyCode.Mouse0 + (mouseInputType - MouseInputType.Mouse0);
 					//clicky mouse input
-					if (Input.GetKey    ( mouseKeyCode )) return true;
+					if (Input.GetKey( mouseKeyCode )) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( mouseKeyCode );
 				}else{
 					//mouse axis as button input
@@ -196,7 +196,7 @@ namespace SinputSystems{
 					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
 
 					//button check now
-					if (Input.GetKey( (KeyCode)(int)keyCode )) return 1f;
+					if (Input.GetKey(keyCode)) return 1f;
 				}
 
 				//gamepad axis check

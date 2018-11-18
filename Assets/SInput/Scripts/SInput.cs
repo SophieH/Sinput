@@ -13,6 +13,7 @@ public static class Sinput {
 	public static int MAXCONNECTEDGAMEPADS { get {return 11; } }
 	public static int MAXAXISPERGAMEPAD { get {return 28; } }
 	public static int MAXBUTTONSPERGAMEPAD { get {return 20; } }
+	private static readonly int HashedEmptyString = Animator.StringToHash("");
 	
 
 	//are keyboard & mouse used by two seperate players (distinct=true) or by a single player (distinct=false)
@@ -179,6 +180,8 @@ public static class Sinput {
 				newControl.scales[k] = scheme.smartControls[i].scale;
 			}
 
+			newControl.Hash();
+
 			loadedSmartControls.Add(newControl);
 		}
 		smartControls = loadedSmartControls.ToArray();
@@ -250,8 +253,6 @@ public static class Sinput {
 	/// <summary>
 	/// tells Sinput to return false/0f for any input checks until the wait time has passed
 	/// </summary>
-	/// <param name="waitTime"></param>
-	/// <param name="slot"></param>
 	public static void ResetInputs(float waitTime, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		
@@ -346,28 +347,34 @@ public static class Sinput {
 	/// <para>will return InputDeviceSlot.any if no device pressed the button this frame</para>
 	/// <para>use it for 'Pres A to join!' type multiplayer, and instantiate a player for the returned slot (if it isn't DeviceSlot.any)</para>
 	/// </summary>
-	/// <param name="controlName"></param>
-	/// <returns></returns>
 	public static SinputSystems.InputDeviceSlot GetSlotPress(string controlName){
+		return GetSlotPress(Animator.StringToHash(controlName));
+	}
+	/// <summary>
+	/// like GetButtonDown() but returns ~which~ keyboard/gamepad input slot pressed the control
+	/// <para>will return InputDeviceSlot.any if no device pressed the button this frame</para>
+	/// <para>use it for 'Pres A to join!' type multiplayer, and instantiate a player for the returned slot (if it isn't DeviceSlot.any)</para>
+	/// </summary>
+	public static SinputSystems.InputDeviceSlot GetSlotPress(int controlNameHashed) {
 		//like GetButtonDown() but returns ~which~ keyboard/gamepad input slot pressed the control
 		//use it for 'Pres A to join!' type multiplayer, and instantiate a player for the returned slot (if it isn't DeviceSlot.any)
 
 		SinputUpdate();
 
 		if (keyboardAndMouseAreDistinct){
-			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboard;
-			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.mouse;
+			if (GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboard;
+			if (GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.mouse;
 		}else{
-			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboardAndMouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
-			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
-			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
+			if (GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.keyboardAndMouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
+			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
+			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
 		}
 
 		for (int i = (int) SinputSystems.InputDeviceSlot.gamepad1; i <= (int) SinputSystems.InputDeviceSlot.gamepad11; i++) {
-			if (GetButtonDown(controlName, (SinputSystems.InputDeviceSlot) i)) return (SinputSystems.InputDeviceSlot) i;
+			if (GetButtonDown(controlNameHashed, (SinputSystems.InputDeviceSlot) i)) return (SinputSystems.InputDeviceSlot) i;
 		}
 		
-		if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.virtual1)) return SinputSystems.InputDeviceSlot.virtual1;
+		if (GetButtonDown(controlNameHashed, SinputSystems.InputDeviceSlot.virtual1)) return SinputSystems.InputDeviceSlot.virtual1;
 
 		return SinputSystems.InputDeviceSlot.any;
 	}
@@ -377,30 +384,56 @@ public static class Sinput {
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame
 	/// </summary>
-	public static bool GetButton(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.HELD); }
+	public static bool GetButton(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButton(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control is Held this frame
+	/// </summary>
+	public static bool GetButton(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.HELD); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame
 	/// </summary>
-	public static bool GetButtonDown(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.DOWN); }
+	public static bool GetButtonDown(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonDown(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Pressed this frame
+	/// </summary>
+	public static bool GetButtonDown(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.DOWN); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame
 	/// </summary>
-	public static bool GetButtonUp(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.UP); }
+	public static bool GetButtonUp(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonUp(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Released this frame
+	/// </summary>
+	public static bool GetButtonUp(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.UP); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.HELD, true); }
+	public static bool GetButtonRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonRaw(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control is Held this frame, regardless of the Control's toggle setting.
+	/// </summary>
+	public static bool GetButtonRaw(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.HELD, true); }
+
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonDownRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.DOWN, true); }
+	public static bool GetButtonDownRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonDownRaw(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, regardless of the Control's toggle setting.
+	/// </summary>
+	public static bool GetButtonDownRaw(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.DOWN, true); }
+
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonUpRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.UP, true); }
+	public static bool GetButtonUpRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonUpRaw(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Released this frame, regardless of the Control's toggle setting.
+	/// </summary>
+	public static bool GetButtonUpRaw(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.UP, true); }
 
 	//repeating button checks
 	/// <summary>
@@ -411,18 +444,19 @@ public static class Sinput {
 	/// How quickly GetButtonDownRepeating() will repeat.
 	/// </summary>
 	public static float buttonRepeat = 0.1f;
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
-	/// <para>Use this for menu scrolling inputs</para>
-	/// </summary>
-	public static bool GetButtonDownRepeating(string controlName) { return ButtonCheck(controlName, SinputSystems.InputDeviceSlot.any, SinputSystems.ButtonAction.REPEATING); }
-	/// <summary>
-	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
-	/// <para>Use this for menu scrolling inputs</para>
-	/// </summary>
-	public static bool GetButtonDownRepeating(string controlName, SinputSystems.InputDeviceSlot slot) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.REPEATING); }
 
-	static bool ButtonCheck(string controlName, SinputSystems.InputDeviceSlot slot, SinputSystems.ButtonAction bAction, bool getRawValue = false){
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
+	/// <para>Use this for menu scrolling inputs</para>
+	/// </summary>
+	public static bool GetButtonDownRepeating(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetButtonDownRepeating(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
+	/// <para>Use this for menu scrolling inputs</para>
+	/// </summary>
+	public static bool GetButtonDownRepeating(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlNameHashed, slot, SinputSystems.ButtonAction.REPEATING); }
+
+	static bool ButtonCheck(int controlNameHashed, SinputSystems.InputDeviceSlot slot, SinputSystems.ButtonAction bAction, bool getRawValue = false) {
 		
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return false;
@@ -430,20 +464,20 @@ public static class Sinput {
 		var controlFound = false;
 
 		for (int i=0; i<_controls.Length; i++){
-			if (_controls[i].name == controlName){
+			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
 				if (_controls[i].GetButtonState(bAction, slot, getRawValue)) return true;
 			}
 		}
 
 		for (int i=0; i<smartControls.Length; i++){
-			if (smartControls[i].name == controlName){
+			if (smartControls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
 				if (smartControls[i].ButtonCheck(bAction, slot)) return true;
 			}
 		}
 
-		if (!controlFound) Debug.LogError("Sinput Error: Control \"" + controlName + "\" not found in list of controls or SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Control \"" + controlNameHashed + "\" not found in list of controls or SmartControls.");
 
 		return false;
 	}
@@ -453,46 +487,47 @@ public static class Sinput {
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	public static float GetAxis(string controlName) { return AxisCheck(controlName, SinputSystems.InputDeviceSlot.any); }
+	public static float GetAxis(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetAxis(Animator.StringToHash(controlName), slot); }
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	public static float GetAxis(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlName, slot); }
-
+	public static float GetAxis(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlNameHashed, slot); }
 
 	/// <summary>
 	/// Returns the raw value of a Sinput Control or Smart Control
 	/// </summary>
-	public static float GetAxisRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlName, slot, true); }
+	public static float GetAxisRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetAxisRaw(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns the raw value of a Sinput Control or Smart Control
+	/// </summary>
+	public static float GetAxisRaw(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlNameHashed, slot, true); }
 
-	static float AxisCheck(string controlName, SinputSystems.InputDeviceSlot slot, bool getRawValue=false){
-
+	static float AxisCheck(int controlNameHashed, SinputSystems.InputDeviceSlot slot, bool getRawValue = false) {
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return 0f;
 
-		if (controlName=="") return 0f;
+		if (controlNameHashed == HashedEmptyString) return 0f;
 
 		var controlFound = false;
-		var v = 0f;
 
 		var returnV = 0f;
 		for (int i=0; i<_controls.Length; i++){
-			if (_controls[i].name == controlName){
+			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
-				v = _controls[i].GetAxisState(slot);
+				var v = _controls[i].GetAxisState(slot);
 				if (Mathf.Abs(v) > returnV) returnV = v;
 			}
 		}
 
 		for (int i=0; i<smartControls.Length; i++){
-			if (smartControls[i].name == controlName){
+			if (smartControls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
-				v = smartControls[i].GetValue(slot, getRawValue);
+				var v = smartControls[i].GetValue(slot, getRawValue);
 				if (Mathf.Abs(v) > returnV) returnV = v;
 			}
 		}
 
-		if (!controlFound) Debug.LogError("Sinput Error: Control \"" + controlName + "\" not found in list of Controls or SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Control \"" + controlNameHashed + "\" not found in list of Controls or SmartControls.");
 
 		return returnV;
 	}
@@ -501,29 +536,20 @@ public static class Sinput {
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
-	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, bool normalClip = true) { return Vector2Check(controlNameA, controlNameB, SinputSystems.InputDeviceSlot.any, normalClip); }
-	/// <summary>
-	/// Returns a Vector2 made with GetAxis() values applied to x and y
-	/// </summary>
-	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot) { return Vector2Check(controlNameA, controlNameB, slot, true); }
-	/// <summary>
-	/// Returns a Vector2 made with GetAxis() values applied to x and y
-	/// </summary>
-	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot, bool normalClip) { return Vector2Check(controlNameA, controlNameB, slot, normalClip); }
+	public static Vector2 GetVector(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any, bool normalClip = true) { return Vector2Check(Animator.StringToHash(controlNameA), Animator.StringToHash(controlNameB), slot, normalClip); }
 
-	static Vector2 Vector2Check(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot, bool normalClip){
-
+	static Vector2 Vector2Check(int controlNameAHashed, int controlNameBHashed, SinputSystems.InputDeviceSlot slot, bool normalClip) {
 		SinputUpdate();
 
 		Vector2 returnVec2;
-		returnVec2.x = AxisCheck(controlNameA, slot);
-		returnVec2.y = AxisCheck(controlNameB, slot);
+		returnVec2.x = AxisCheck(controlNameAHashed, slot);
+		returnVec2.y = AxisCheck(controlNameBHashed, slot);
 
-		if (normalClip && returnVec2.magnitude > 1f) {
-			returnVec2.Normalize();
+		if (normalClip) {
+			var magnitude = returnVec2.magnitude;
+			if (magnitude > 1f) {
+				returnVec2 = returnVec2 / magnitude; // Normalize reusing magnitude (optimization)
+			}
 		}
 
 		return returnVec2;
@@ -532,27 +558,21 @@ public static class Sinput {
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, bool normalClip = true) { return Vector3Check(controlNameA, controlNameB, controlNameC, SinputSystems.InputDeviceSlot.any, true); }
-	/// <summary>
-	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
-	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, true); }
-	/// <summary>
-	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
-	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot, bool normalClip) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, normalClip); }
+	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any, bool normalClip = true) { return Vector3Check(Animator.StringToHash(controlNameA), Animator.StringToHash(controlNameB), Animator.StringToHash(controlNameC), slot, normalClip); }
 
-	static Vector3 Vector3Check(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot, bool normalClip){
-
+	static Vector3 Vector3Check(int controlNameAHashed, int controlNameBHashed, int controlNameCHashed, SinputSystems.InputDeviceSlot slot, bool normalClip) {
 		SinputUpdate();
 
 		Vector3 returnVec3;
-		returnVec3.x = AxisCheck(controlNameA, slot);
-		returnVec3.y = AxisCheck(controlNameB, slot);
-		returnVec3.z = AxisCheck(controlNameC, slot);
+		returnVec3.x = AxisCheck(controlNameAHashed, slot);
+		returnVec3.y = AxisCheck(controlNameBHashed, slot);
+		returnVec3.z = AxisCheck(controlNameCHashed, slot);
 
-		if (normalClip && returnVec3.magnitude > 1f) {
-			returnVec3.Normalize();
+		if (normalClip) {
+			var magnitude = returnVec3.magnitude;
+			if (magnitude > 1f) {
+				returnVec3 = returnVec3 / magnitude; // Normalize reusing magnitude (optimization)
+			}
 		}
 
 		return returnVec3;
@@ -563,11 +583,16 @@ public static class Sinput {
 	/// Returns false if the value returned by GetAxis(controlName) on this frame should NOT be multiplied by delta time.
 	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
 	/// </summary>
-	public static bool PrefersDeltaUse(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
+	public static bool PrefersDeltaUse(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return PrefersDeltaUse(Animator.StringToHash(controlName), slot); }
+	/// <summary>
+	/// Returns false if the value returned by GetAxis(controlName) on this frame should NOT be multiplied by delta time.
+	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
+	/// </summary>
+	public static bool PrefersDeltaUse(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 
 		SinputUpdate();
 
-		if (controlName == "") return false;
+		if (controlNameHashed == HashedEmptyString) return false;
 
 		var preferDelta = true;
 		var controlFound = false;
@@ -575,7 +600,7 @@ public static class Sinput {
 
 		var returnV = 0f;
 		for (int i = 0; i < _controls.Length; i++) {
-			if (_controls[i].name == controlName) {
+			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound = true;
 				v = _controls[i].GetAxisState(slot);
 				if (Mathf.Abs(v) > returnV) {
@@ -587,7 +612,7 @@ public static class Sinput {
 
 		//now check smart controls for framerate independence
 		for (int i = 0; i < smartControls.Length; i++) {
-			if (smartControls[i].name == controlName) {
+			if (smartControls[i].nameHashed == controlNameHashed) {
 				controlFound = true;
 				v = smartControls[i].GetValue(slot, true);
 				if (Mathf.Abs(v) > returnV) {
@@ -598,7 +623,7 @@ public static class Sinput {
 			}
 		}
 
-		if (!controlFound) Debug.LogError("Sinput Error: Control \"" + controlName + "\" not found in list of Controls or SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Control \"" + controlNameHashed + "\" not found in list of Controls or SmartControls.");
 
 		return preferDelta;
 	}
@@ -607,29 +632,37 @@ public static class Sinput {
 	/// <summary>
 	/// sets whether a control treats GetButton() calls with press or with toggle behaviour
 	/// </summary>
-	public static void SetToggle(string controlName, bool toggle) {
+	public static void SetToggle(string controlName, bool toggle) { SetToggle(Animator.StringToHash(controlName), toggle); }
+	/// <summary>
+	/// sets whether a control treats GetButton() calls with press or with toggle behaviour
+	/// </summary>
+	public static void SetToggle(int controlNameHashed, bool toggle) {
 		SinputUpdate();
 		var controlFound = false;
 		for (int i = 0; i < _controls.Length; i++) {
-			if (_controls[i].name == controlName) {
+			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound = true;
 				_controls[i].isToggle = toggle;
 			}
 		}
-		if (!controlFound) Debug.LogError("Sinput Error: Control \"" + controlName + "\" not found in list of Controls or SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Control \"" + controlNameHashed + "\" not found in list of Controls or SmartControls.");
 	}
 	
 	/// <summary>
 	/// returns true if a control treats GetButton() calls with toggle behaviour
 	/// </summary>
-	public static bool GetToggle(string controlName) {
+	public static bool GetToggle(string controlName) { return GetToggle(Animator.StringToHash(controlName)); }
+	/// <summary>
+	/// returns true if a control treats GetButton() calls with toggle behaviour
+	/// </summary>
+	public static bool GetToggle(int controlNameHashed) {
 		SinputUpdate();
 		for (int i = 0; i < _controls.Length; i++) {
-			if (_controls[i].name == controlName) {
+			if (_controls[i].nameHashed == controlNameHashed) {
 				return _controls[i].isToggle;
 			}
 		}
-		Debug.LogError("Sinput Error: Control \"" + controlName + "\" not found in list of Controls or SmartControls.");
+		Debug.LogError("Sinput Error: Hashed Control \"" + controlNameHashed + "\" not found in list of Controls or SmartControls.");
 		return false;
 	}
 
@@ -637,11 +670,15 @@ public static class Sinput {
 	/// <summary>
 	/// set a smart control to be inverted or not
 	/// </summary>
-	public static void SetInverted(string smartControlName, bool invert, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
+	public static void SetInverted(string smartControlName, bool invert, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { SetInverted(Animator.StringToHash(smartControlName), invert, slot); }
+	/// <summary>
+	/// set a smart control to be inverted or not
+	/// </summary>
+	public static void SetInverted(int smartControlNameHashed, bool invert, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		var controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
-			if (smartControls[i].name == smartControlName) {
+			if (smartControls[i].nameHashed == smartControlNameHashed) {
 				controlFound = true;
 				if (slot == SinputSystems.InputDeviceSlot.any) {
 					for (int k=0; k<totalPossibleDeviceSlots; k++) {
@@ -652,20 +689,24 @@ public static class Sinput {
 				}
 			}
 		}
-		if (!controlFound) Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Smart Control \"" + smartControlNameHashed + "\" not found in list of SmartControls.");
 	}
 	
 	/// <summary>
 	/// returns true if a smart control is inverted
 	/// </summary>
-	public static bool GetInverted(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
+	public static bool GetInverted(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetInverted(Animator.StringToHash(smartControlName), slot); }
+	/// <summary>
+	/// returns true if a smart control is inverted
+	/// </summary>
+	public static bool GetInverted(int smartControlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		for (int i = 0; i < smartControls.Length; i++) {
-			if (smartControls[i].name == smartControlName) {
+			if (smartControls[i].nameHashed == smartControlNameHashed) {
 				return smartControls[i].inversion[(int)slot];
 			}
 		}
-		Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
+		Debug.LogError("Sinput Error: Hashed Smart Control \"" + smartControlNameHashed + "\" not found in list of SmartControls.");
 		return false;
 	}
 
@@ -673,11 +714,15 @@ public static class Sinput {
 	/// <summary>
 	/// sets scale ("sensitivity") of a smart control
 	/// </summary>
-	public static void SetScale(string smartControlName, float scale, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
+	public static void SetScale(string smartControlName, float scale, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { SetScale(Animator.StringToHash(smartControlName), scale, slot); }
+	/// <summary>
+	/// sets scale ("sensitivity") of a smart control
+	/// </summary>
+	public static void SetScale(int smartControlNameHashed, float scale, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		var controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
-			if (smartControls[i].name == smartControlName) {
+			if (smartControls[i].nameHashed == smartControlNameHashed) {
 				controlFound = true;
 				if (slot == SinputSystems.InputDeviceSlot.any) {
 					for (int k = 0; k < totalPossibleDeviceSlots; k++) {
@@ -688,19 +733,23 @@ public static class Sinput {
 				}
 			}
 		}
-		if (!controlFound) Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
+		if (!controlFound) Debug.LogError("Sinput Error: Hashed Smart Control \"" + smartControlNameHashed + "\" not found in list of SmartControls.");
 	}
 	
 	/// <summary>
 	/// gets scale of a smart control
 	/// </summary>
-	public static float GetScale(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
+	public static float GetScale(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetScale(Animator.StringToHash(smartControlName), slot); }
+	/// <summary>
+	/// gets scale of a smart control
+	/// </summary>
+	public static float GetScale(int smartControlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		for (int i = 0; i < smartControls.Length; i++) {
-			if (smartControls[i].name == smartControlName) {
+			if (smartControls[i].nameHashed == smartControlNameHashed) {
 				return smartControls[i].scales[(int)slot];
 			}
 		}
-		Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
+		Debug.LogError("Sinput Error: Hashed Smart Control \"" + smartControlNameHashed + "\" not found in list of SmartControls.");
 		return 1f;
 	}
 
