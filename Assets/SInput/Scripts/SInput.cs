@@ -88,7 +88,7 @@ public static class Sinput {
 	static void Init(){
 		Debug.Log("Initializing SInput");
 
-		totalPossibleDeviceSlots = System.Enum.GetValues(typeof(SinputSystems.InputDeviceSlot)).Length;
+		totalPossibleDeviceSlots = Enum.GetValues(typeof(SinputSystems.InputDeviceSlot)).Length;
 
 		zeroInputWaits = new float[totalPossibleDeviceSlots];
 		zeroInputs = new bool[totalPossibleDeviceSlots];
@@ -374,7 +374,6 @@ public static class Sinput {
 
 
 	//Button control checks
-	private static bool controlFound = false;//used in control checks to tell whether a control was found or not
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame
 	/// </summary>
@@ -428,7 +427,7 @@ public static class Sinput {
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return false;
 
-		controlFound = false;
+		var controlFound = false;
 
 		for (int i=0; i<_controls.Length; i++){
 			if (_controls[i].name == controlName){
@@ -451,9 +450,6 @@ public static class Sinput {
 
 
 	//Axis control checks
-	private static float returnV; //used in axis checks to hold the return value
-	private static float v;
-
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
@@ -474,11 +470,12 @@ public static class Sinput {
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return 0f;
 
-		controlFound = false;
-
 		if (controlName=="") return 0f;
 
-		returnV = 0f;
+		var controlFound = false;
+		var v = 0f;
+
+		var returnV = 0f;
 		for (int i=0; i<_controls.Length; i++){
 			if (_controls[i].name == controlName){
 				controlFound=true;
@@ -501,7 +498,6 @@ public static class Sinput {
 	}
 
 	//vector checks
-	private static Vector2 returnVec2;
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
@@ -522,7 +518,7 @@ public static class Sinput {
 
 		SinputUpdate();
 
-		returnVec2 = Vector2.zero;
+		Vector2 returnVec2;
 		returnVec2.x = AxisCheck(controlNameA, slot);
 		returnVec2.y = AxisCheck(controlNameB, slot);
 
@@ -533,7 +529,6 @@ public static class Sinput {
 		return returnVec2;
 	}
 
-	private static Vector3 returnVec3;
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
@@ -551,7 +546,7 @@ public static class Sinput {
 
 		SinputUpdate();
 
-		returnVec3 = Vector3.zero;
+		Vector3 returnVec3;
 		returnVec3.x = AxisCheck(controlNameA, slot);
 		returnVec3.y = AxisCheck(controlNameB, slot);
 		returnVec3.z = AxisCheck(controlNameC, slot);
@@ -564,7 +559,6 @@ public static class Sinput {
 	}
 	
 	//frame delta preference
-	private static bool preferDelta;
 	/// <summary>
 	/// Returns false if the value returned by GetAxis(controlName) on this frame should NOT be multiplied by delta time.
 	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
@@ -573,12 +567,13 @@ public static class Sinput {
 
 		SinputUpdate();
 
-		preferDelta = true;
-
-		controlFound = false;
-
 		if (controlName == "") return false;
-		returnV = 0f;
+
+		var preferDelta = true;
+		var controlFound = false;
+		var v = 0f;
+
+		var returnV = 0f;
 		for (int i = 0; i < _controls.Length; i++) {
 			if (_controls[i].name == controlName) {
 				controlFound = true;
@@ -614,7 +609,7 @@ public static class Sinput {
 	/// </summary>
 	public static void SetToggle(string controlName, bool toggle) {
 		SinputUpdate();
-		controlFound = false;
+		var controlFound = false;
 		for (int i = 0; i < _controls.Length; i++) {
 			if (_controls[i].name == controlName) {
 				controlFound = true;
@@ -644,7 +639,7 @@ public static class Sinput {
 	/// </summary>
 	public static void SetInverted(string smartControlName, bool invert, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
-		controlFound = false;
+		var controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
 				controlFound = true;
@@ -680,7 +675,7 @@ public static class Sinput {
 	/// </summary>
 	public static void SetScale(string smartControlName, float scale, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
-		controlFound = false;
+		var controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
 				controlFound = true;

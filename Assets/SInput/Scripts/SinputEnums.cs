@@ -548,6 +548,8 @@ namespace SinputSystems{
 	}
 
 	public static class SInputEnums {
+		public static readonly KeyboardInputType[] KeyboardInputTypes = (KeyboardInputType[]) Enum.GetValues(typeof(KeyboardInputType));
+		public static readonly MouseInputType[] MouseInputTypes = (MouseInputType[]) Enum.GetValues(typeof(MouseInputType));
 
 		/// <summary>
 		/// Get the KeyCode that corresponds to a specific gamepad number and button

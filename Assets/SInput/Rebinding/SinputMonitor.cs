@@ -50,7 +50,7 @@ namespace SinputSystems.Rebinding{
 
 
 			//keyboard check
-			foreach (KeyboardInputType keycode in Enum.GetValues(typeof(KeyboardInputType))) {
+			foreach (KeyboardInputType keycode in SInputEnums.KeyboardInputTypes) {
 				KeyCheck((KeyCode)Enum.Parse(typeof(KeyCode), keycode.ToString()));
 			}
 
@@ -71,7 +71,7 @@ namespace SinputSystems.Rebinding{
 				if (changedMouse != MouseInputType.None) changeFound = true;
 			}
 
-			foreach (MouseInputType mouseInput in Enum.GetValues(typeof(MouseInputType))){
+			foreach (MouseInputType mouseInput in SInputEnums.MouseInputTypes){
 				MouseCheck( mouseInput );
 			}
 
