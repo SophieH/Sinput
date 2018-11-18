@@ -17,13 +17,10 @@ public static class Sinput {
 
 	//are keyboard & mouse used by two seperate players (distinct=true) or by a single player (distinct=false)
 	private static bool keyboardAndMouseAreDistinct = false;
-
-	//how many devices can be connected
-	private static int _totalPossibleDeviceSlots;
 	/// <summary>
 	/// Total possible device slots that Sinput may detect. (Including keyboard, mouse, virtual, and any slots)
 	/// </summary>
-	public static int totalPossibleDeviceSlots { get { return _totalPossibleDeviceSlots; } }
+	public static int totalPossibleDeviceSlots { get; private set; }
 
 	//overall mouse sensitivity
 	/// <summary>
@@ -81,7 +78,7 @@ public static class Sinput {
 	/// <summary>
 	/// Number of connected gamepads that Sinput is aware of.
 	/// </summary>
-	public static int connectedGamepads = 0;
+	public static int connectedGamepads { get { return _gamepads.Length; } }
 
 	//XR stuff
 	private static SinputSystems.XR.SinputXR _xr;
@@ -99,10 +96,10 @@ public static class Sinput {
 		if (initialised) return;
 		initialised = true;
 
-		_totalPossibleDeviceSlots = System.Enum.GetValues(typeof(InputDeviceSlot)).Length;
+		totalPossibleDeviceSlots = System.Enum.GetValues(typeof(InputDeviceSlot)).Length;
 
-		zeroInputWaits = new float[_totalPossibleDeviceSlots];
-		zeroInputs = new bool[_totalPossibleDeviceSlots];
+		zeroInputWaits = new float[totalPossibleDeviceSlots];
+		zeroInputs = new bool[totalPossibleDeviceSlots];
 
 		_xr = new SinputSystems.XR.SinputXR();
 	}
@@ -186,9 +183,9 @@ public static class Sinput {
 			newControl.snap = scheme.smartControls[i].snap;
 			//newControl.scale = scheme.smartControls[i].scale;
 
-			newControl.inversion = new bool[_totalPossibleDeviceSlots];
-			newControl.scales = new float[_totalPossibleDeviceSlots];
-			for (int k = 0; k < _totalPossibleDeviceSlots; k++) {
+			newControl.inversion = new bool[totalPossibleDeviceSlots];
+			newControl.scales = new float[totalPossibleDeviceSlots];
+			for (int k = 0; k < totalPossibleDeviceSlots; k++) {
 				newControl.inversion[k] = scheme.smartControls[i].invert;
 				newControl.scales[k] = scheme.smartControls[i].scale;
 			}
@@ -247,7 +244,7 @@ public static class Sinput {
 		}
 
 		//count down till we can stop zeroing inputs
-		for (int i = 0; i < _totalPossibleDeviceSlots; i++) {
+		for (int i = 0; i < totalPossibleDeviceSlots; i++) {
 			if (zeroInputs[i]) {
 				zeroInputWaits[i] -= Time.deltaTime;
 				if (zeroInputWaits[i] <= 0f) zeroInputs[i] = false;
@@ -274,7 +271,7 @@ public static class Sinput {
 		
 		if (slot == InputDeviceSlot.any) {
 			//reset all slots' input
-			for (int i=0; i<_totalPossibleDeviceSlots; i++) {
+			for (int i=0; i<totalPossibleDeviceSlots; i++) {
 				zeroInputWaits[i] = waitTime;
 				zeroInputs[i] = true;
 			}
@@ -324,7 +321,6 @@ public static class Sinput {
 			for (int i=0; i<_gamepads.Length; i++){
 				_gamepads[i] = tempInputGamepads[i].ToUpper();
 			}
-			connectedGamepads = _gamepads.Length;
 
 			//reload common mapping information for any new gamepads
 			CommonGamepadMappings.ReloadCommonMaps();
@@ -669,7 +665,7 @@ public static class Sinput {
 			if (_smartControls[i].name == smartControlName) {
 				controlFound = true;
 				if (slot == InputDeviceSlot.any) {
-					for (int k=0; k<_totalPossibleDeviceSlots; k++) {
+					for (int k=0; k<totalPossibleDeviceSlots; k++) {
 						_smartControls[i].inversion[k] = invert;
 					}
 				} else {
@@ -705,7 +701,7 @@ public static class Sinput {
 			if (_smartControls[i].name == smartControlName) {
 				controlFound = true;
 				if (slot == InputDeviceSlot.any) {
-					for (int k = 0; k < _totalPossibleDeviceSlots; k++) {
+					for (int k = 0; k < totalPossibleDeviceSlots; k++) {
 						_smartControls[i].scales[k] = scale;
 					}
 				} else {
