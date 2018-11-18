@@ -295,12 +295,10 @@ public static class Sinput {
 
 	//update gamepads
 	static int lastCheckedGamepadRefreshFrame = -99;
-	static string[] tempInputGamepads;//more optimal to have it defined here than inside the CheckGamepads function
 	/// <summary>
 	/// Checks whether connected gamepads have changed.
 	/// <para>This is called before every input check so it is uneccesary for you to use it.</para>
 	/// </summary>
-	/// <param name="refreshGamepadsNow"></param>
 	public static void CheckGamepads(bool refreshGamepadsNow = false){
 		if (Time.frameCount == lastCheckedGamepadRefreshFrame && !refreshGamepadsNow) return;
 		lastCheckedGamepadRefreshFrame = Time.frameCount;
@@ -309,20 +307,20 @@ public static class Sinput {
 
 		Init();
 
-		tempInputGamepads = Input.GetJoystickNames();
+		var tempInputGamepads = Input.GetJoystickNames();
 		if (connectedGamepads != tempInputGamepads.Length) refreshGamepadsNow = true; //number of connected gamepads has changed
 		if (!refreshGamepadsNow && nextGamepadCheck < Time.frameCount){
 			//this check is for the rare case gamepads get re-ordered in a single frame & the length of GetJoystickNames() stays the same
 			nextGamepadCheck = Time.frameCount + 500;
 			for (int i=0; i<connectedGamepads; i++){
-				if (_gamepads[i] != tempInputGamepads[i].ToUpper()) refreshGamepadsNow = true;
+				if (!_gamepads[i].Equals(tempInputGamepads[i], StringComparison.InvariantCultureIgnoreCase)) refreshGamepadsNow = true;
 			}
 		}
 		if (refreshGamepadsNow){
 			//Debug.Log("Refreshing gamepads");
 
 			//connected gamepads have changed, lets update them
-			_gamepads = new string[tempInputGamepads.Length];
+			_gamepads = tempInputGamepads; // reuse array given that we already have generated it using Input.GetJoystickNames()
 			for (int i=0; i<_gamepads.Length; i++){
 				_gamepads[i] = tempInputGamepads[i].ToUpper();
 			}
