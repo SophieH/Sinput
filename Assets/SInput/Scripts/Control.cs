@@ -287,7 +287,8 @@ namespace SinputSystems{
 	
 
 		//axis checks
-		public float GetAxisState(InputDeviceSlot slot) {
+		public float GetAxisState(InputDeviceSlot slot, out bool prefersDeltaUse) {
+			prefersDeltaUse = controlStates[(int)slot].valuePrefersDeltaUse;
 			return controlStates[(int)slot].value;
 		}
 		public bool GetAxisStateDeltaPreference(InputDeviceSlot slot) {
@@ -466,23 +467,23 @@ namespace SinputSystems{
 	//state of control, for a frame, for one slot
 	class ControlState {
 		//basic cacheing of all relevant inputs for this slot
-		public float value = 0f;
-		public bool axisAsButtonHeld = false;
-		public bool held = false;
-		public bool released = false;
-		public bool pressed = false;
+		public float value;
+		public bool axisAsButtonHeld;
+		public bool held;
+		public bool released;
+		public bool pressed;
 
 		//for toggle checks
-		public bool toggleHeld = false;
-		public bool toggleReleased = false;
-		public bool togglePressed = false;
+		public bool toggleHeld;
+		public bool toggleReleased;
+		public bool togglePressed;
 
 		//for checking if the value is something that should be multiplied by deltaTime or not
 		public bool valuePrefersDeltaUse = true;
 
 		//for Sinput.ButtonPressRepeat() checks
-		public bool repeatPressed = false;
-		public float repeatTime = 0f;
-		public float holdTime = 0f;
+		public bool repeatPressed;
+		public float repeatTime;
+		public float holdTime;
 	}
 }

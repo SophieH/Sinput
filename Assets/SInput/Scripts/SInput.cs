@@ -487,23 +487,20 @@ public static class Sinput {
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	public static float GetAxis(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetAxis(Animator.StringToHash(controlName), slot); }
-	/// <summary>
-	/// Returns the value of a Sinput Control or Smart Control.
-	/// </summary>
-	public static float GetAxis(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlNameHashed, slot); }
-
+	public static float GetAxis(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(Animator.StringToHash(controlName), out var _, slot, false); }
+	
 	/// <summary>
 	/// Returns the raw value of a Sinput Control or Smart Control
 	/// </summary>
-	public static float GetAxisRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return GetAxisRaw(Animator.StringToHash(controlName), slot); }
-	/// <summary>
-	/// Returns the raw value of a Sinput Control or Smart Control
-	/// </summary>
-	public static float GetAxisRaw(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlNameHashed, slot, true); }
+	public static float GetAxisRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(Animator.StringToHash(controlName), out var _, slot, true); }
 
-	static float AxisCheck(int controlNameHashed, SinputSystems.InputDeviceSlot slot, bool getRawValue = false) {
+	internal static float AxisCheck(int controlNameHashed, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any, bool getRawValue = false) {
+		bool _;
+		return AxisCheck(controlNameHashed, out _, slot, getRawValue);
+	}
+	internal static float AxisCheck(int controlNameHashed, out bool prefersDeltaUse, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any, bool getRawValue = false) {
 		SinputUpdate();
+		prefersDeltaUse = true; // Defaults to true, but doesn't matter because when default, the value returned is 0
 		if (zeroInputs[(int)slot]) return 0f;
 
 		if (controlNameHashed == HashedEmptyString) return 0f;
@@ -514,16 +511,24 @@ public static class Sinput {
 		for (int i=0; i<_controls.Length; i++){
 			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
-				var v = _controls[i].GetAxisState(slot);
-				if (Mathf.Abs(v) > returnV) returnV = v;
+				bool prefersDeltaUseTmp;
+				var v = _controls[i].GetAxisState(slot, out prefersDeltaUseTmp);
+				if (Mathf.Abs(v) > returnV) {
+					prefersDeltaUse = prefersDeltaUseTmp;
+					returnV = v;
+				}
 			}
 		}
 
 		for (int i=0; i<smartControls.Length; i++){
 			if (smartControls[i].nameHashed == controlNameHashed) {
 				controlFound=true;
-				var v = smartControls[i].GetValue(slot, getRawValue);
-				if (Mathf.Abs(v) > returnV) returnV = v;
+				bool prefersDeltaUseTmp;
+				var v = smartControls[i].GetValue(slot, getRawValue, out prefersDeltaUseTmp);
+				if (Mathf.Abs(v) > returnV) {
+					prefersDeltaUse = prefersDeltaUseTmp;
+					returnV = v;
+				}
 			}
 		}
 
@@ -596,16 +601,16 @@ public static class Sinput {
 
 		var preferDelta = true;
 		var controlFound = false;
-		var v = 0f;
 
 		var returnV = 0f;
 		for (int i = 0; i < _controls.Length; i++) {
 			if (_controls[i].nameHashed == controlNameHashed) {
 				controlFound = true;
-				v = _controls[i].GetAxisState(slot);
+				bool tmpPreferDelta;
+				var v = _controls[i].GetAxisState(slot, out tmpPreferDelta);
 				if (Mathf.Abs(v) > returnV) {
 					returnV = v;
-					preferDelta = _controls[i].GetAxisStateDeltaPreference(slot);
+					preferDelta = tmpPreferDelta;
 				}
 			}
 		}
@@ -614,11 +619,11 @@ public static class Sinput {
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].nameHashed == controlNameHashed) {
 				controlFound = true;
-				v = smartControls[i].GetValue(slot, true);
+				bool tmpPreferDelta;
+				var v = smartControls[i].GetValue(slot, true, out tmpPreferDelta);
 				if (Mathf.Abs(v) > returnV) {
 					returnV = v;
-
-					preferDelta &= PrefersDeltaUse(smartControls[i].positiveControlHashed, slot) && PrefersDeltaUse(smartControls[i].negativeControlHashed, slot);
+					preferDelta = tmpPreferDelta;
 				}
 			}
 		}

@@ -82,12 +82,13 @@ namespace SinputSystems{
 			
 			for (int slot=0; slot<rawValues.Length; slot++){
 				
-				rawValues[slot] = Sinput.GetAxis(positiveControlHashed, (InputDeviceSlot)slot) - Sinput.GetAxis(negativeControlHashed, (InputDeviceSlot)slot);
+				bool positivePrefersDelta, negativePrefersDelta;
+				rawValues[slot] = Sinput.AxisCheck(positiveControlHashed, out positivePrefersDelta, (InputDeviceSlot) slot) - Sinput.AxisCheck(negativeControlHashed, out negativePrefersDelta, (InputDeviceSlot) slot);
 
 				if (inversion[slot]) rawValues[slot] *= -1f;
 
 				//Is the rawvalue this frame is from a framerate independent input like a mouse movement? if so, we don't want it smoothed and wanna force getAxis checks to return raw
-				valuePrefersDeltaUse[slot] = Sinput.PrefersDeltaUse(positiveControlHashed, (InputDeviceSlot)slot) && Sinput.PrefersDeltaUse(negativeControlHashed, (InputDeviceSlot)slot);
+				valuePrefersDeltaUse[slot] = positivePrefersDelta && negativePrefersDelta;
 			}
 
 			for (int slot=0; slot<controlValues.Length; slot++){
@@ -137,13 +138,15 @@ namespace SinputSystems{
 		}
 
 		//return current value
-		public float GetValue() { return GetValue(InputDeviceSlot.any, false); }
-		public float GetValue(InputDeviceSlot slot) { return GetValue(slot, false); }
-		public float GetValue(InputDeviceSlot slot, bool getRawValue){
+		public float GetValue(InputDeviceSlot slot = InputDeviceSlot.any, bool getRawValue = false) { return GetValue(slot, false, out var _); }
+		public float GetValue(InputDeviceSlot slot, bool getRawValue, out bool prefersDeltaUse) {
+			prefersDeltaUse = true; // Defaults to true, but doesn't matter because when default, the value returned is 0
 			if ((int)slot>=controlValues.Length) return 0f; //not a slot we have any input info for
 
+			prefersDeltaUse = valuePrefersDeltaUse[(int) slot];
+
 			//if this input is checking a framerate independent input like a mouse, return the raw value regardless of getRawValue
-			if (!valuePrefersDeltaUse[(int)slot]) return rawValues[(int)slot] * scales[(int)slot];
+			if (!prefersDeltaUse) return rawValues[(int)slot] * scales[(int)slot];
 
 			//deadzone clipping
 			if (Mathf.Abs(controlValues[(int)slot]) < deadzone) return 0f;
@@ -160,12 +163,9 @@ namespace SinputSystems{
 		//button check
 		public bool ButtonCheck(ButtonAction bAction){ return ButtonCheck(bAction, InputDeviceSlot.any); }
 		public bool ButtonCheck(ButtonAction bAction, InputDeviceSlot slot){
-			if (bAction == ButtonAction.DOWN && Sinput.GetButtonDown(positiveControl, slot)) return true;
-			if (bAction == ButtonAction.DOWN && Sinput.GetButtonDown(negativeControl, slot)) return true;
-			if (bAction == ButtonAction.HELD && Sinput.GetButton(positiveControl, slot)) return true;
-			if (bAction == ButtonAction.HELD && Sinput.GetButton(negativeControl, slot)) return true;
-			if (bAction == ButtonAction.UP && Sinput.GetButtonUp(positiveControl, slot)) return true;
-			if (bAction == ButtonAction.UP && Sinput.GetButtonUp(negativeControl, slot)) return true;
+			if (bAction == ButtonAction.DOWN && (Sinput.GetButtonDown(positiveControlHashed, slot) || Sinput.GetButtonDown(negativeControlHashed, slot))) return true;
+			if (bAction == ButtonAction.HELD && (Sinput.GetButton(positiveControlHashed, slot)     || Sinput.GetButton(negativeControlHashed, slot)))     return true;
+			if (bAction == ButtonAction.UP   && (Sinput.GetButtonUp(positiveControlHashed, slot)   || Sinput.GetButtonUp(negativeControlHashed, slot)))   return true;
 			return false;
 		}
 
