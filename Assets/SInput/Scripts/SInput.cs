@@ -60,9 +60,7 @@ public static class Sinput {
 		}
 		//set { Init(); _controls = value; }
 	}
-
-	private static SmartControl[] _smartControls;
-	public static SmartControl[] smartControls { get { return _smartControls; } }
+	public static SmartControl[] smartControls { get; private set; }
 
 	//gamepads list is checked every GetButton/GetAxis call, when it updates all common mapped inputs are reapplied appropriately
 	static int nextGamepadCheck=-99;
@@ -183,8 +181,8 @@ public static class Sinput {
 
 			loadedSmartControls.Add(newControl);
 		}
-		_smartControls = loadedSmartControls.ToArray();
-		for (int i=0; i<_smartControls.Length; i++) _smartControls[i].Init();
+		smartControls = loadedSmartControls.ToArray();
+		for (int i=0; i<smartControls.Length; i++) smartControls[i].Init();
 
 		//now load any saved control scheme with custom rebound inputs
 		if (loadCustomControls && SinputFileIO.SaveDataExists(controlSchemeName)){
@@ -225,9 +223,9 @@ public static class Sinput {
 		}
 
 		//update our smart controls
-		if (null != _smartControls) {
-			for (int i = 0; i < _smartControls.Length; i++) {
-				_smartControls[i].Update();
+		if (null != smartControls) {
+			for (int i = 0; i < smartControls.Length; i++) {
+				smartControls[i].Update();
 			}
 		}
 
@@ -270,9 +268,9 @@ public static class Sinput {
 		}
 		
 		//reset smartControl values
-		if (_smartControls != null) {
-			for (int i = 0; i < _smartControls.Length; i++) {
-				_smartControls[i].ResetAllValues(slot);
+		if (smartControls != null) {
+			for (int i = 0; i < smartControls.Length; i++) {
+				smartControls[i].ResetAllValues(slot);
 			}
 		}
 	}
@@ -335,8 +333,8 @@ public static class Sinput {
 			}
 		//}
 		//if (null != smartControls) {
-			for (int i = 0; i < _smartControls.Length; i++) {
-				_smartControls[i].Init();
+			for (int i = 0; i < smartControls.Length; i++) {
+				smartControls[i].Init();
 			}
 		//}
 	}
@@ -439,10 +437,10 @@ public static class Sinput {
 			}
 		}
 
-		for (int i=0; i<_smartControls.Length; i++){
-			if (_smartControls[i].name == controlName){
+		for (int i=0; i<smartControls.Length; i++){
+			if (smartControls[i].name == controlName){
 				controlFound=true;
-				if (_smartControls[i].ButtonCheck(bAction, slot)) return true;
+				if (smartControls[i].ButtonCheck(bAction, slot)) return true;
 			}
 		}
 
@@ -489,10 +487,10 @@ public static class Sinput {
 			}
 		}
 
-		for (int i=0; i<_smartControls.Length; i++){
-			if (_smartControls[i].name == controlName){
+		for (int i=0; i<smartControls.Length; i++){
+			if (smartControls[i].name == controlName){
 				controlFound=true;
-				v = _smartControls[i].GetValue(slot, getRawValue);
+				v = smartControls[i].GetValue(slot, getRawValue);
 				if (Mathf.Abs(v) > returnV) returnV = v;
 			}
 		}
@@ -593,14 +591,14 @@ public static class Sinput {
 		}
 
 		//now check smart controls for framerate independence
-		for (int i = 0; i < _smartControls.Length; i++) {
-			if (_smartControls[i].name == controlName) {
+		for (int i = 0; i < smartControls.Length; i++) {
+			if (smartControls[i].name == controlName) {
 				controlFound = true;
-				v = _smartControls[i].GetValue(slot, true);
+				v = smartControls[i].GetValue(slot, true);
 				if (Mathf.Abs(v) > returnV) {
 					returnV = v;
 
-					if (!PrefersDeltaUse(_smartControls[i].positiveControl, slot) || !PrefersDeltaUse(_smartControls[i].negativeControl, slot)) preferDelta = false;
+					if (!PrefersDeltaUse(smartControls[i].positiveControl, slot) || !PrefersDeltaUse(smartControls[i].negativeControl, slot)) preferDelta = false;
 				}
 			}
 		}
@@ -647,15 +645,15 @@ public static class Sinput {
 	public static void SetInverted(string smartControlName, bool invert, InputDeviceSlot slot=InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
-		for (int i = 0; i < _smartControls.Length; i++) {
-			if (_smartControls[i].name == smartControlName) {
+		for (int i = 0; i < smartControls.Length; i++) {
+			if (smartControls[i].name == smartControlName) {
 				controlFound = true;
 				if (slot == InputDeviceSlot.any) {
 					for (int k=0; k<totalPossibleDeviceSlots; k++) {
-						_smartControls[i].inversion[k] = invert;
+						smartControls[i].inversion[k] = invert;
 					}
 				} else {
-					_smartControls[i].inversion[(int)slot] = invert;
+					smartControls[i].inversion[(int)slot] = invert;
 				}
 			}
 		}
@@ -667,9 +665,9 @@ public static class Sinput {
 	/// </summary>
 	public static bool GetInverted(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
 		SinputUpdate();
-		for (int i = 0; i < _smartControls.Length; i++) {
-			if (_smartControls[i].name == smartControlName) {
-				return _smartControls[i].inversion[(int)slot];
+		for (int i = 0; i < smartControls.Length; i++) {
+			if (smartControls[i].name == smartControlName) {
+				return smartControls[i].inversion[(int)slot];
 			}
 		}
 		Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
@@ -683,15 +681,15 @@ public static class Sinput {
 	public static void SetScale(string smartControlName, float scale, InputDeviceSlot slot = InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
-		for (int i = 0; i < _smartControls.Length; i++) {
-			if (_smartControls[i].name == smartControlName) {
+		for (int i = 0; i < smartControls.Length; i++) {
+			if (smartControls[i].name == smartControlName) {
 				controlFound = true;
 				if (slot == InputDeviceSlot.any) {
 					for (int k = 0; k < totalPossibleDeviceSlots; k++) {
-						_smartControls[i].scales[k] = scale;
+						smartControls[i].scales[k] = scale;
 					}
 				} else {
-					_smartControls[i].scales[(int)slot] = scale;
+					smartControls[i].scales[(int)slot] = scale;
 				}
 			}
 		}
@@ -702,9 +700,9 @@ public static class Sinput {
 	/// gets scale of a smart control
 	/// </summary>
 	public static float GetScale(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
-		for (int i = 0; i < _smartControls.Length; i++) {
-			if (_smartControls[i].name == smartControlName) {
-				return _smartControls[i].scales[(int)slot];
+		for (int i = 0; i < smartControls.Length; i++) {
+			if (smartControls[i].name == smartControlName) {
+				return smartControls[i].scales[(int)slot];
 			}
 		}
 		Debug.LogError("Sinput Error: Smart Control \"" + smartControlName + "\" not found in list of SmartControls.");
