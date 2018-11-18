@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -20,11 +18,6 @@ namespace SinputSystems.Rebinding{
 		[HideInInspector]
 		public MouseInputType changedMouse = MouseInputType.None;
 
-
-		// Use this for initialization
-		void Start () {
-			
-		}
 
 		int mouseMovementMin = 50;
 		public void ResetMouseListening() {
@@ -70,11 +63,11 @@ namespace SinputSystems.Rebinding{
 				mouseVerticalTotal += Input.GetAxis("Mouse Vertical");
 				mouseScrollTotal += Input.GetAxis("Mouse Scroll");
 				if (mouseHorizontalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveRight;
-				if (mouseHorizontalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveLeft;
+				else if (mouseHorizontalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveLeft;
 				if (mouseVerticalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveUp;
-				if (mouseVerticalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveDown;
+				else if (mouseVerticalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveDown;
 				if (mouseScrollTotal >= 1) changedMouse = MouseInputType.MouseScrollUp;
-				if (mouseScrollTotal <= -1) changedMouse = MouseInputType.MouseScrollDown;
+				else if (mouseScrollTotal <= -1) changedMouse = MouseInputType.MouseScrollDown;
 				if (changedMouse != MouseInputType.None) changeFound = true;
 			}
 
@@ -261,15 +254,9 @@ namespace SinputSystems.Rebinding{
 
 		void MouseCheck(MouseInputType m){
 			if (!AcceptChangesFromSlot(-1)) return;
-			bool change = false;
-			if (m == MouseInputType.Mouse0 && Input.GetKeyDown( KeyCode.Mouse0 )) change = true;
-			if (m == MouseInputType.Mouse1 && Input.GetKeyDown( KeyCode.Mouse1 )) change = true;
-			if (m == MouseInputType.Mouse2 && Input.GetKeyDown( KeyCode.Mouse2 )) change = true;
-			if (m == MouseInputType.Mouse3 && Input.GetKeyDown( KeyCode.Mouse3 )) change = true;
-			if (m == MouseInputType.Mouse4 && Input.GetKeyDown( KeyCode.Mouse4 )) change = true;
-			if (m == MouseInputType.Mouse5 && Input.GetKeyDown( KeyCode.Mouse5 )) change = true;
-			if (m == MouseInputType.Mouse6 && Input.GetKeyDown( KeyCode.Mouse6 )) change = true;
-			if (change){
+
+			KeyCode keyCode = KeyCode.Mouse0 + (m - MouseInputType.Mouse0);
+			if (Input.GetKeyDown(keyCode)) {
 				changeFound = true;
 				changedMouse = m;
 			}
