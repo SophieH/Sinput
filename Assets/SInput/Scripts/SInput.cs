@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using SinputSystems;
+// Don't use `using SinputSystems;` to avoid conflicts
 
 
 public static class Sinput {
@@ -35,22 +35,22 @@ public static class Sinput {
 	public static string controlSchemeName = "ControlScheme";
 
 	//the control scheme, set it with SetControlScheme()
-	private static Control[] _controls;
+	private static SinputSystems.Control[] _controls;
 	/// <summary>
 	/// Returns a copy of the current Sinput control list
 	/// <para>Note: This is not the fastest thing so don't go calling it in a loop every frame, make yourself a local copy.</para>
 	/// </summary>
-	public static Control[] controls {
+	public static SinputSystems.Control[] controls {
 		get {
 			//make a copy of the controls so we're definitely not returning something that will effect _controls
-			Control[] returnControlList = new Control[_controls.Length];
+			SinputSystems.Control[] returnControlList = new SinputSystems.Control[_controls.Length];
 			for (int i = 0; i < _controls.Length; i++) {
-				returnControlList[i] = new Control(_controls[i].name);
+				returnControlList[i] = new SinputSystems.Control(_controls[i].name);
 				for (int k = 0; k < _controls[i].commonMappings.Count; k++) {
 					returnControlList[i].commonMappings.Add(_controls[i].commonMappings[k]);
 				}
 
-				returnControlList[i].inputs = new List<DeviceInput>();
+				returnControlList[i].inputs = new List<SinputSystems.DeviceInput>();
 				for (int k = 0; k < _controls[i].inputs.Count; k++) {
 					returnControlList[i].inputs.Add(_controls[i].inputs[k]);
 				}
@@ -60,7 +60,7 @@ public static class Sinput {
 		}
 		//set { Init(); _controls = value; }
 	}
-	public static SmartControl[] smartControls { get; private set; }
+	public static SinputSystems.SmartControl[] smartControls { get; private set; }
 
 	//gamepads list is checked every GetButton/GetAxis call, when it updates all common mapped inputs are reapplied appropriately
 	static int nextGamepadCheck=-99;
@@ -88,7 +88,7 @@ public static class Sinput {
 	static void Init(){
 		Debug.Log("Initializing SInput");
 
-		totalPossibleDeviceSlots = System.Enum.GetValues(typeof(InputDeviceSlot)).Length;
+		totalPossibleDeviceSlots = System.Enum.GetValues(typeof(SinputSystems.InputDeviceSlot)).Length;
 
 		zeroInputWaits = new float[totalPossibleDeviceSlots];
 		zeroInputs = new bool[totalPossibleDeviceSlots];
@@ -106,7 +106,7 @@ public static class Sinput {
 	public static void LoadControlScheme(string schemeName, bool loadCustomControls) {
 		schemeLoaded = false;
 		//Debug.Log("load scheme name!");
-		UnityEngine.Object[] projectControlSchemes = Resources.LoadAll("", typeof(ControlScheme));
+		UnityEngine.Object[] projectControlSchemes = Resources.LoadAll("", typeof(SinputSystems.ControlScheme));
 
 		int schemeIndex = -1;
 		for (int i=0; i<projectControlSchemes.Length; i++){
@@ -117,14 +117,14 @@ public static class Sinput {
 			return;
 		}
 		//controlScheme = (ControlScheme)projectControlSchemes[schemeIndex];
-		LoadControlScheme((ControlScheme)projectControlSchemes[schemeIndex], loadCustomControls);
+		LoadControlScheme((SinputSystems.ControlScheme)projectControlSchemes[schemeIndex], loadCustomControls);
 	}
 	/// <summary>
 	/// Load a Control Scheme.
 	/// </summary>
 	/// <param name="scheme"></param>
 	/// <param name="loadCustomControls"></param>
-	public static void LoadControlScheme(ControlScheme scheme, bool loadCustomControls) {
+	public static void LoadControlScheme(SinputSystems.ControlScheme scheme, bool loadCustomControls) {
 		//Debug.Log("load scheme asset!");
 
 		schemeLoaded = false;
@@ -135,9 +135,9 @@ public static class Sinput {
 		CheckGamepads(true);
 
 		//Generate controls from controlScheme asset
-		List<Control> loadedControls = new List<Control>();
+		List<SinputSystems.Control> loadedControls = new List<SinputSystems.Control>();
 		for (int i=0; i<scheme.controls.Count; i++){
-			Control newControl = new Control(scheme.controls[i].name);
+			SinputSystems.Control newControl = new SinputSystems.Control(scheme.controls[i].name);
 
 			for (int k=0; k<scheme.controls[i].keyboardInputs.Count; k++){
 				newControl.AddKeyboardInput( (KeyCode)Enum.Parse(typeof(KeyCode), scheme.controls[i].keyboardInputs[k].ToString()) );
@@ -160,9 +160,9 @@ public static class Sinput {
 		_controls = loadedControls.ToArray();
 
 		//Generate smartControls from controlScheme asset
-		List<SmartControl> loadedSmartControls = new List<SmartControl>();
+		List<SinputSystems.SmartControl> loadedSmartControls = new List<SinputSystems.SmartControl>();
 		for (int i=0; i<scheme.smartControls.Count; i++){
-			SmartControl newControl = new SmartControl(scheme.smartControls[i].name);
+			SinputSystems.SmartControl newControl = new SinputSystems.SmartControl(scheme.smartControls[i].name);
 
 			newControl.positiveControl = scheme.smartControls[i].positiveControl;
 			newControl.negativeControl = scheme.smartControls[i].negativeControl;
@@ -185,9 +185,9 @@ public static class Sinput {
 		for (int i=0; i<smartControls.Length; i++) smartControls[i].Init();
 
 		//now load any saved control scheme with custom rebound inputs
-		if (loadCustomControls && SinputFileIO.SaveDataExists(controlSchemeName)){
+		if (loadCustomControls && SinputSystems.SinputFileIO.SaveDataExists(controlSchemeName)){
 			//Debug.Log("Found saved binding!");
-			_controls = SinputFileIO.LoadControls( _controls, controlSchemeName);
+			_controls = SinputSystems.SinputFileIO.LoadControls( _controls, controlSchemeName);
 		}
 
 		//make sure controls have any gamepad-relevant stuff set correctly
@@ -246,16 +246,16 @@ public static class Sinput {
 	/// tells Sinput to return false/0f for any input checks until half a second has passed
 	/// </summary>
 	/// <param name="slot"></param>
-	public static void ResetInputs(InputDeviceSlot slot = InputDeviceSlot.any) { ResetInputs(0.5f, slot); } //default wait is half a second
+	public static void ResetInputs(SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { ResetInputs(0.5f, slot); } //default wait is half a second
 	/// <summary>
 	/// tells Sinput to return false/0f for any input checks until the wait time has passed
 	/// </summary>
 	/// <param name="waitTime"></param>
 	/// <param name="slot"></param>
-	public static void ResetInputs(float waitTime, InputDeviceSlot slot=InputDeviceSlot.any) {
+	public static void ResetInputs(float waitTime, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		
-		if (slot == InputDeviceSlot.any) {
+		if (slot == SinputSystems.InputDeviceSlot.any) {
 			//reset all slots' input
 			for (int i=0; i<totalPossibleDeviceSlots; i++) {
 				zeroInputWaits[i] = waitTime;
@@ -307,7 +307,7 @@ public static class Sinput {
 			}
 
 			//reload common mapping information for any new gamepads
-			CommonGamepadMappings.ReloadCommonMaps();
+			SinputSystems.CommonGamepadMappings.ReloadCommonMaps();
 			
 			//refresh control information relating to gamepads
 			if (schemeLoaded) RefreshGamepadControls();
@@ -348,28 +348,28 @@ public static class Sinput {
 	/// </summary>
 	/// <param name="controlName"></param>
 	/// <returns></returns>
-	public static InputDeviceSlot GetSlotPress(string controlName){
+	public static SinputSystems.InputDeviceSlot GetSlotPress(string controlName){
 		//like GetButtonDown() but returns ~which~ keyboard/gamepad input slot pressed the control
 		//use it for 'Pres A to join!' type multiplayer, and instantiate a player for the returned slot (if it isn't DeviceSlot.any)
 
 		SinputUpdate();
 
 		if (keyboardAndMouseAreDistinct){
-			if (GetButtonDown(controlName, InputDeviceSlot.keyboard)) return InputDeviceSlot.keyboard;
-			if (GetButtonDown(controlName, InputDeviceSlot.mouse)) return InputDeviceSlot.mouse;
+			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboard;
+			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.mouse;
 		}else{
-			if (GetButtonDown(controlName, InputDeviceSlot.keyboardAndMouse)) return InputDeviceSlot.keyboardAndMouse;
-			if (!zeroInputs[(int)InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, InputDeviceSlot.keyboard)) return InputDeviceSlot.keyboardAndMouse;
-			if (!zeroInputs[(int)InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, InputDeviceSlot.mouse)) return InputDeviceSlot.keyboardAndMouse;
+			if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboardAndMouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
+			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, SinputSystems.InputDeviceSlot.keyboard)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
+			if (!zeroInputs[(int) SinputSystems.InputDeviceSlot.keyboardAndMouse] && GetButtonDown(controlName, SinputSystems.InputDeviceSlot.mouse)) return SinputSystems.InputDeviceSlot.keyboardAndMouse;
 		}
 
-		for (int i = (int) InputDeviceSlot.gamepad1; i <= (int) InputDeviceSlot.gamepad11; i++) {
-			if (GetButtonDown(controlName, (InputDeviceSlot) i)) return (InputDeviceSlot) i;
+		for (int i = (int) SinputSystems.InputDeviceSlot.gamepad1; i <= (int) SinputSystems.InputDeviceSlot.gamepad11; i++) {
+			if (GetButtonDown(controlName, (SinputSystems.InputDeviceSlot) i)) return (SinputSystems.InputDeviceSlot) i;
 		}
 		
-		if (GetButtonDown(controlName, InputDeviceSlot.virtual1)) return InputDeviceSlot.virtual1;
+		if (GetButtonDown(controlName, SinputSystems.InputDeviceSlot.virtual1)) return SinputSystems.InputDeviceSlot.virtual1;
 
-		return InputDeviceSlot.any;
+		return SinputSystems.InputDeviceSlot.any;
 	}
 
 
@@ -378,30 +378,30 @@ public static class Sinput {
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame
 	/// </summary>
-	public static bool GetButton(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.HELD); }
+	public static bool GetButton(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.HELD); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame
 	/// </summary>
-	public static bool GetButtonDown(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.DOWN); }
+	public static bool GetButtonDown(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.DOWN); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame
 	/// </summary>
-	public static bool GetButtonUp(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.UP); }
+	public static bool GetButtonUp(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.UP); }
 
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control is Held this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.HELD, true); }
+	public static bool GetButtonRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.HELD, true); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonDownRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.DOWN, true); }
+	public static bool GetButtonDownRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.DOWN, true); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Released this frame, regardless of the Control's toggle setting.
 	/// </summary>
-	public static bool GetButtonUpRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return ButtonCheck(controlName, slot, ButtonAction.UP, true); }
+	public static bool GetButtonUpRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.UP, true); }
 
 	//repeating button checks
 	/// <summary>
@@ -416,14 +416,14 @@ public static class Sinput {
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
 	/// <para>Use this for menu scrolling inputs</para>
 	/// </summary>
-	public static bool GetButtonDownRepeating(string controlName) { return ButtonCheck(controlName, InputDeviceSlot.any, ButtonAction.REPEATING); }
+	public static bool GetButtonDownRepeating(string controlName) { return ButtonCheck(controlName, SinputSystems.InputDeviceSlot.any, SinputSystems.ButtonAction.REPEATING); }
 	/// <summary>
 	/// Returns true if a Sinput Control or Smart Control was Pressed this frame, or if it has been held long enough to start repeating.
 	/// <para>Use this for menu scrolling inputs</para>
 	/// </summary>
-	public static bool GetButtonDownRepeating(string controlName, InputDeviceSlot slot) { return ButtonCheck(controlName, slot, ButtonAction.REPEATING); }
+	public static bool GetButtonDownRepeating(string controlName, SinputSystems.InputDeviceSlot slot) { return ButtonCheck(controlName, slot, SinputSystems.ButtonAction.REPEATING); }
 
-	static bool ButtonCheck(string controlName, InputDeviceSlot slot, ButtonAction bAction, bool getRawValue = false){
+	static bool ButtonCheck(string controlName, SinputSystems.InputDeviceSlot slot, SinputSystems.ButtonAction bAction, bool getRawValue = false){
 		
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return false;
@@ -457,19 +457,19 @@ public static class Sinput {
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	public static float GetAxis(string controlName) { return AxisCheck(controlName, InputDeviceSlot.any); }
+	public static float GetAxis(string controlName) { return AxisCheck(controlName, SinputSystems.InputDeviceSlot.any); }
 	/// <summary>
 	/// Returns the value of a Sinput Control or Smart Control.
 	/// </summary>
-	public static float GetAxis(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return AxisCheck(controlName, slot); }
+	public static float GetAxis(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlName, slot); }
 
 
 	/// <summary>
 	/// Returns the raw value of a Sinput Control or Smart Control
 	/// </summary>
-	public static float GetAxisRaw(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) { return AxisCheck(controlName, slot, true); }
+	public static float GetAxisRaw(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) { return AxisCheck(controlName, slot, true); }
 
-	static float AxisCheck(string controlName, InputDeviceSlot slot, bool getRawValue=false){
+	static float AxisCheck(string controlName, SinputSystems.InputDeviceSlot slot, bool getRawValue=false){
 
 		SinputUpdate();
 		if (zeroInputs[(int)slot]) return 0f;
@@ -506,19 +506,19 @@ public static class Sinput {
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
 	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, bool normalClip = true) { return Vector2Check(controlNameA, controlNameB, InputDeviceSlot.any, normalClip); }
+	public static Vector2 GetVector(string controlNameA, string controlNameB, bool normalClip = true) { return Vector2Check(controlNameA, controlNameB, SinputSystems.InputDeviceSlot.any, normalClip); }
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
 	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, InputDeviceSlot slot) { return Vector2Check(controlNameA, controlNameB, slot, true); }
+	public static Vector2 GetVector(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot) { return Vector2Check(controlNameA, controlNameB, slot, true); }
 	/// <summary>
 	/// Returns a Vector2 made with GetAxis() values applied to x and y
 	/// </summary>
 	/// <returns></returns>
-	public static Vector2 GetVector(string controlNameA, string controlNameB, InputDeviceSlot slot, bool normalClip) { return Vector2Check(controlNameA, controlNameB, slot, normalClip); }
+	public static Vector2 GetVector(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot, bool normalClip) { return Vector2Check(controlNameA, controlNameB, slot, normalClip); }
 
-	static Vector2 Vector2Check(string controlNameA, string controlNameB, InputDeviceSlot slot, bool normalClip){
+	static Vector2 Vector2Check(string controlNameA, string controlNameB, SinputSystems.InputDeviceSlot slot, bool normalClip){
 
 		SinputUpdate();
 
@@ -537,17 +537,17 @@ public static class Sinput {
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, bool normalClip = true) { return Vector3Check(controlNameA, controlNameB, controlNameC, InputDeviceSlot.any, true); }
+	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, bool normalClip = true) { return Vector3Check(controlNameA, controlNameB, controlNameC, SinputSystems.InputDeviceSlot.any, true); }
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, true); }
+	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, true); }
 	/// <summary>
 	/// Returns a Vector3 made with GetAxis() values applied to x, y, and z
 	/// </summary>
-	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot, bool normalClip) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, normalClip); }
+	public static Vector3 GetVector(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot, bool normalClip) { return Vector3Check(controlNameA, controlNameB, controlNameC, slot, normalClip); }
 
-	static Vector3 Vector3Check(string controlNameA, string controlNameB, string controlNameC, InputDeviceSlot slot, bool normalClip){
+	static Vector3 Vector3Check(string controlNameA, string controlNameB, string controlNameC, SinputSystems.InputDeviceSlot slot, bool normalClip){
 
 		SinputUpdate();
 
@@ -569,7 +569,7 @@ public static class Sinput {
 	/// Returns false if the value returned by GetAxis(controlName) on this frame should NOT be multiplied by delta time.
 	/// <para>For example, this will return true for gamepad stick values, false for mouse movement values</para>
 	/// </summary>
-	public static bool PrefersDeltaUse(string controlName, InputDeviceSlot slot = InputDeviceSlot.any) {
+	public static bool PrefersDeltaUse(string controlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 
 		SinputUpdate();
 
@@ -642,13 +642,13 @@ public static class Sinput {
 	/// <summary>
 	/// set a smart control to be inverted or not
 	/// </summary>
-	public static void SetInverted(string smartControlName, bool invert, InputDeviceSlot slot=InputDeviceSlot.any) {
+	public static void SetInverted(string smartControlName, bool invert, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
 				controlFound = true;
-				if (slot == InputDeviceSlot.any) {
+				if (slot == SinputSystems.InputDeviceSlot.any) {
 					for (int k=0; k<totalPossibleDeviceSlots; k++) {
 						smartControls[i].inversion[k] = invert;
 					}
@@ -663,7 +663,7 @@ public static class Sinput {
 	/// <summary>
 	/// returns true if a smart control is inverted
 	/// </summary>
-	public static bool GetInverted(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
+	public static bool GetInverted(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
@@ -678,13 +678,13 @@ public static class Sinput {
 	/// <summary>
 	/// sets scale ("sensitivity") of a smart control
 	/// </summary>
-	public static void SetScale(string smartControlName, float scale, InputDeviceSlot slot = InputDeviceSlot.any) {
+	public static void SetScale(string smartControlName, float scale, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		SinputUpdate();
 		controlFound = false;
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
 				controlFound = true;
-				if (slot == InputDeviceSlot.any) {
+				if (slot == SinputSystems.InputDeviceSlot.any) {
 					for (int k = 0; k < totalPossibleDeviceSlots; k++) {
 						smartControls[i].scales[k] = scale;
 					}
@@ -699,7 +699,7 @@ public static class Sinput {
 	/// <summary>
 	/// gets scale of a smart control
 	/// </summary>
-	public static float GetScale(string smartControlName, InputDeviceSlot slot = InputDeviceSlot.any) {
+	public static float GetScale(string smartControlName, SinputSystems.InputDeviceSlot slot = SinputSystems.InputDeviceSlot.any) {
 		for (int i = 0; i < smartControls.Length; i++) {
 			if (smartControls[i].name == smartControlName) {
 				return smartControls[i].scales[(int)slot];
