@@ -84,7 +84,22 @@ namespace SinputSystems{
 				//if checking any slot, call this function for each possible slot
 				//this shouldn't happen anymore
 				if (slot == InputDeviceSlot.any){
-					return ButtonHeldCheck(InputDeviceSlot.gamepad1) || ButtonHeldCheck(InputDeviceSlot.gamepad2) || ButtonHeldCheck(InputDeviceSlot.gamepad3) || ButtonHeldCheck(InputDeviceSlot.gamepad4) || ButtonHeldCheck(InputDeviceSlot.gamepad5) || ButtonHeldCheck(InputDeviceSlot.gamepad6) || ButtonHeldCheck(InputDeviceSlot.gamepad7) || ButtonHeldCheck(InputDeviceSlot.gamepad7) || ButtonHeldCheck(InputDeviceSlot.gamepad9) || ButtonHeldCheck(InputDeviceSlot.gamepad10) || ButtonHeldCheck(InputDeviceSlot.gamepad11) || ButtonHeldCheck(InputDeviceSlot.gamepad12) || ButtonHeldCheck(InputDeviceSlot.gamepad13) || ButtonHeldCheck(InputDeviceSlot.gamepad14) || ButtonHeldCheck(InputDeviceSlot.gamepad15) || ButtonHeldCheck(InputDeviceSlot.gamepad16);
+					return ButtonHeldCheck(InputDeviceSlot.gamepad1) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad2) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad3) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad4) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad5) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad6) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad7) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad8) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad9) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad10) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad11) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad12) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad13) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad14) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad15) ||
+						ButtonHeldCheck(InputDeviceSlot.gamepad16);
 				}
 
 				int slotIndex = ((int)slot)-1;
@@ -95,7 +110,10 @@ namespace SinputSystems{
 				//make sure the gamepad in this slot is one this input is allowed to check (eg don't check PS4 pad bindings for an XBOX pad)
 				bool allowInputFromThisPad=false;
 				for (int i=0; i<allowedSlots.Length; i++){
-					if (slotIndex == allowedSlots[i]) allowInputFromThisPad = true;
+					if (slotIndex == allowedSlots[i]) {
+						allowInputFromThisPad = true;
+						break;
+					}
 				}
 				if (!allowInputFromThisPad) return false;
 
@@ -187,17 +205,18 @@ namespace SinputSystems{
 				//make sure the gamepad in this slot is one this input is allowed to check (eg don't check PS4 pad bindings for an XBOX pad)
 				bool allowInputFromThisPad=false;
 				for (int i=0; i<allowedSlots.Length; i++){
-					if (slotIndex == allowedSlots[i]) allowInputFromThisPad = true;
+					if (slotIndex == allowedSlots[i]) {
+						allowInputFromThisPad = true;
+						break;
+					}
 				}
 
 				if (!allowInputFromThisPad) return 0f;
 
 				//button as axis checks
 				if (inputType == InputDeviceType.GamepadButton){
-					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
-
 					//button check now
-					if (Input.GetKey(keyCode)) return 1f;
+					if (Input.GetKey(SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber))) return 1f;
 				}
 
 				//gamepad axis check

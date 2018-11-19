@@ -71,20 +71,19 @@ namespace SinputSystems{
 
 			controlState.value = 0f;
 			controlState.valuePrefersDeltaUse = true;
-			controlState.axisAsButtonHeld = false;
 			
 			foreach (var input in inputs) {
 				var v = input.AxisCheck(slot);
 
 				//update axis-as-button state
 				if (input.inputType == InputDeviceType.GamepadAxis) {
-					controlState.axisAsButtonHeld |= v > input.axisButtoncompareVal;
+					controlState.held |= v > input.axisButtoncompareVal;
 				}
 				else if (input.inputType == InputDeviceType.Mouse) {
-					controlState.axisAsButtonHeld |= Math.Abs(v) > 0.5f;
+					controlState.held |= Math.Abs(v) > 0.5f;
 				}
 
-				if (Math.Abs(v) > controlState.value) {
+				if (Math.Abs(v) > Math.Abs(controlState.value)) {
 					//this is the value we're going with
 					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime
@@ -98,9 +97,6 @@ namespace SinputSystems{
 				controlState.held |= input.ButtonHeldCheck(slot);
 			}
 
-			//check if this control is held
-			controlState.held |= controlState.axisAsButtonHeld;
-
 			UpdateButtonStates(controlState, wasHeld);
 		}
 
@@ -111,12 +107,11 @@ namespace SinputSystems{
 			controlState.held = false;
 
 			controlState.value = 0f;
-			controlState.axisAsButtonHeld = false;
 
 			for (int i = 1; i < controlStates.Length; i++) {
 				var v = controlStates[i].value;
 
-				if (Math.Abs(v) > controlState.value) {
+				if (Math.Abs(v) > Math.Abs(controlState.value)) {
 					//this is the value we're going with
 					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime
@@ -166,7 +161,9 @@ namespace SinputSystems{
 
 		public void ResetControlStates() {
 			//set all values for this control to 0
-			foreach (var controlState in controlStates) controlState.Reset();
+			for (int i = 0; i < controlStates.Length; i++) {
+				controlStates[i].Reset();
+			}
 		}
 
 		//button checks
@@ -373,7 +370,6 @@ namespace SinputSystems{
 	class ControlState {
 		//basic cacheing of all relevant inputs for this slot
 		public float value;
-		public bool axisAsButtonHeld;
 		public bool held;
 		public bool released;
 		public bool pressed;
@@ -392,7 +388,6 @@ namespace SinputSystems{
 
 		public void Reset() {
 			value = 0f;
-			axisAsButtonHeld = false;
 			held = false;
 			released = false;
 			pressed = false;
