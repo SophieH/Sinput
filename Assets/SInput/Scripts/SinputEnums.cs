@@ -585,7 +585,7 @@ namespace SinputSystems{
 		}
 
 		/// <summary>
-		/// Get a string that can be used with <see cref="Input.GetAxis(string)"/>
+		/// Get a string that can be used with <see cref="Input.GetAxisRaw(string)"/>
 		/// </summary>
 		/// <param name="joystick">0-index based (starts from 0)</param>
 		/// <param name="axis">0-index based (starts from 0)</param>

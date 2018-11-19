@@ -75,12 +75,25 @@ namespace SinputSystems{
 			foreach (var input in inputs) {
 				var v = input.AxisCheck(slot);
 
-				//update axis-as-button state
-				if (input.inputType == InputDeviceType.GamepadAxis) {
-					controlState.held |= v > input.axisButtoncompareVal;
-				}
-				else if (input.inputType == InputDeviceType.Mouse) {
-					controlState.held |= Math.Abs(v) > 0.5f;
+				//update axis-as-button and button state (When checking axis we also check for button state)
+				switch (input.inputType) {
+					case InputDeviceType.GamepadAxis:
+						controlState.held |= v > input.axisButtoncompareVal;
+						break;
+					case InputDeviceType.Mouse:
+						controlState.held |= Math.Abs(v) > 0.5f;
+						break;
+					case InputDeviceType.Keyboard:
+					case InputDeviceType.GamepadButton:
+						controlState.held |= v == 1;
+						break;
+					case InputDeviceType.Virtual:
+						// Meh. Would be better to unify GetVirtualButton and GetVirtualAxis
+						controlState.held |= VirtualInputs.GetVirtualButton(input.virtualInputID);
+						break;
+					case InputDeviceType.XR:
+						// TO DO
+						break;
 				}
 
 				if (Math.Abs(v) > Math.Abs(controlState.value)) {
@@ -93,8 +106,6 @@ namespace SinputSystems{
 						input.mouseInputType > MouseInputType.MouseScroll;
 				}
 
-				//check if this control is held
-				controlState.held |= input.ButtonHeldCheck(slot);
 			}
 
 			UpdateButtonStates(controlState, wasHeld);

@@ -59,9 +59,9 @@ namespace SinputSystems.Rebinding{
 
 			//mouse checks
 			if (AcceptChangesFromSlot(-1)) { 
-				mouseHorizontalTotal += Input.GetAxis("Mouse Horizontal");
-				mouseVerticalTotal += Input.GetAxis("Mouse Vertical");
-				mouseScrollTotal += Input.GetAxis("Mouse Scroll");
+				mouseHorizontalTotal += Input.GetAxisRaw("Mouse Horizontal");
+				mouseVerticalTotal += Input.GetAxisRaw("Mouse Vertical");
+				mouseScrollTotal += Input.GetAxisRaw("Mouse Scroll");
 				if (mouseHorizontalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveRight;
 				else if (mouseHorizontalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveLeft;
 				if (mouseVerticalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveUp;
