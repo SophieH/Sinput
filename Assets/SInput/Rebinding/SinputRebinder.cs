@@ -497,8 +497,8 @@ namespace SinputSystems.Rebinding{
 			newInputPanel.deleteButton = newInputPanelObj.transform.Find("InputDelete").GetComponent<Button>();
 			newInputPanel.inputButtonText = newInputPanel.inputButton.transform.Find("Text").GetComponent<Text>();
 
-			int inputIndex = cp.inputPanels.Count;
-			inputIndex = controls[controlIndex].inputs.Count - 1;
+			//int inputIndex = cp.inputPanels.Count;
+			int inputIndex = controls[controlIndex].inputs.Count - 1;
 			//Debug.Log("INPUT INDEX: " + inputIndex.ToString());
 			newInputPanel.inputButton.onClick.AddListener(delegate { BeginRebindInput(controlIndex, inputIndex, deviceName, newInputPanel.inputButtonText); });
 			newInputPanel.deleteButton.onClick.AddListener(delegate { DeleteInput(controlIndex, inputIndex, deviceName, newInputPanelObj.transform); });

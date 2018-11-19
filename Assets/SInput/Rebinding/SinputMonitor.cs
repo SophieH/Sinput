@@ -135,7 +135,7 @@ namespace SinputSystems.Rebinding{
 
 			for (int i=0; i<padCount; i++){
 				for (int a=0; a<allGamepadAxis[i].axisValues.Length; a++){
-					float presentValue = Input.GetAxisRaw("J_"+(i+1).ToString()+"_"+(a+1).ToString());
+					float presentValue = Input.GetAxisRaw(SInputEnums.GetAxisString(i, a));
 					if (AcceptChangesFromSlot(i+1) && allGamepadAxis[i].measuredFirstChange[a] && allGamepadAxis[i].axisValues[a] != presentValue){
 						float restingValue = 0f;
 						if (allGamepadAxis[i].zeroTime[a] >= allGamepadAxis[i].minusOneTime[a] && allGamepadAxis[i].zeroTime[a] >= allGamepadAxis[i].plusOneTime[a]){
@@ -221,7 +221,7 @@ namespace SinputSystems.Rebinding{
 				for (int a=0; a<allGamepadAxis[i].axisValues.Length; a++){
 					allGamepadAxis[i].measuredFirstChange[a]=false;
 
-					allGamepadAxis[i].axisValues[a] = Input.GetAxisRaw("J_"+(i+1).ToString()+"_"+(a+1).ToString());
+					allGamepadAxis[i].axisValues[a] = Input.GetAxisRaw(SInputEnums.GetAxisString(i, a));
 
 					allGamepadAxis[i].zeroTime[a] = 0f;
 					allGamepadAxis[i].plusOneTime[a] = 0f;

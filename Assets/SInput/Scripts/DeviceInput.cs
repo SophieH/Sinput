@@ -119,11 +119,8 @@ namespace SinputSystems{
 
 				//gamepad button check
 				if (inputType == InputDeviceType.GamepadButton){
-					//get the keycode for the gamepad's slot/button
-					KeyCode keyCode = SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber);
-
-					//button check now
-					if (Input.GetKey(keyCode)) return true;
+					//get the keycode for the gamepad's slot/button and check
+					if (Input.GetKey(SInputEnums.GetGamepadKeyCode(slotIndex, gamepadButtonNumber))) return true;
 					//if (bAction == ButtonAction.UP)   return Input.GetKeyUp  ( (KeyCode)(int)keyCode );
 				}
 
