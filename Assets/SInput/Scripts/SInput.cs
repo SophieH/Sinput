@@ -85,8 +85,11 @@ public static class Sinput {
 	}
 
 	//init
+	private static bool initialized = false;
 	[RuntimeInitializeOnLoadMethod]
-	static void Init(){
+	public static void Init(){
+		if (!initialized) initialized = true;
+		else return;
 		Debug.Log("Initializing SInput");
 
 		totalPossibleDeviceSlots = Enum.GetValues(typeof(SinputSystems.InputDeviceSlot)).Length;
