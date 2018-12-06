@@ -1,4 +1,3 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,48 +13,51 @@ namespace SinputSystems {
 
 			//Debug.Log("Loading common mapping");
 
-			OSFamily thisOS = OSFamily.Other;
-			if (Application.platform == RuntimePlatform.OSXEditor) thisOS = OSFamily.MacOSX;
-			if (Application.platform == RuntimePlatform.OSXPlayer) thisOS = OSFamily.MacOSX;
-			if (Application.platform == RuntimePlatform.WindowsEditor) thisOS = OSFamily.Windows;
-			if (Application.platform == RuntimePlatform.WindowsPlayer) thisOS = OSFamily.Windows;
-			if (Application.platform == RuntimePlatform.LinuxEditor) thisOS = OSFamily.Linux;
-			if (Application.platform == RuntimePlatform.LinuxPlayer) thisOS = OSFamily.Linux;
-			if (Application.platform == RuntimePlatform.Android) thisOS = OSFamily.Android;
-			if (Application.platform == RuntimePlatform.IPhonePlayer) thisOS = OSFamily.IOS;
-			if (Application.platform == RuntimePlatform.PS4) thisOS = OSFamily.PS4;
-			if (Application.platform == RuntimePlatform.PSP2) thisOS = OSFamily.PSVita;
-			if (Application.platform == RuntimePlatform.XboxOne) thisOS = OSFamily.XboxOne;
-			if (Application.platform == RuntimePlatform.Switch) thisOS = OSFamily.Switch;
+			OSFamily thisOS;
+			switch (Application.platform) {
+				case RuntimePlatform.OSXEditor: thisOS = OSFamily.MacOSX; break;
+				case RuntimePlatform.OSXPlayer: thisOS = OSFamily.MacOSX; break;
+				case RuntimePlatform.WindowsEditor: thisOS = OSFamily.Windows; break;
+				case RuntimePlatform.WindowsPlayer: thisOS = OSFamily.Windows; break;
+				case RuntimePlatform.LinuxEditor: thisOS = OSFamily.Linux; break;
+				case RuntimePlatform.LinuxPlayer: thisOS = OSFamily.Linux; break;
+				case RuntimePlatform.Android: thisOS = OSFamily.Android; break;
+				case RuntimePlatform.IPhonePlayer: thisOS = OSFamily.IOS; break;
+				case RuntimePlatform.PS4: thisOS = OSFamily.PS4; break;
+				case RuntimePlatform.PSP2: thisOS = OSFamily.PSVita; break;
+				case RuntimePlatform.XboxOne: thisOS = OSFamily.XboxOne; break;
+				case RuntimePlatform.Switch: thisOS = OSFamily.Switch; break;
+				default: thisOS = OSFamily.Other; break;
+			}
 
-			System.Object[] commonMappingAssets = Resources.LoadAll("", typeof(CommonMapping));
+			CommonMapping[] commonMappingAssets = Resources.LoadAll<CommonMapping>("");
 			commonMappings = new List<CommonMapping>();
 			string[] gamepads = Sinput.gamepads;
 			int defaultMappingIndex = -1;
 			for (int i = 0; i < commonMappingAssets.Length; i++) {
 				//Debug.Log("HELLOOOOO");
-				//if (((CommonMapping)commonMappingAssets[i]).isXRdevice) Debug.Log("XR deviiiiiice");
+				//if ((commonMappingAssets[i]).isXRdevice) Debug.Log("XR deviiiiiice");
 
-				if (((CommonMapping)commonMappingAssets[i]).os == thisOS) {
+				if ((commonMappingAssets[i]).os == thisOS) {
 					bool gamepadConnected = false;
 					bool partialMatch = false;
-					for (int k = 0; k < ((CommonMapping)commonMappingAssets[i]).names.Count; k++) {
+					for (int k = 0; k < (commonMappingAssets[i]).names.Count; k++) {
 						for (int g = 0; g < gamepads.Length; g++) {
-							if (((CommonMapping)commonMappingAssets[i]).names[k].ToUpper() == gamepads[g]) gamepadConnected = true;
+							if ((commonMappingAssets[i]).names[k].ToUpper() == gamepads[g]) gamepadConnected = true;
 						}
 					}
 
-					for (int k = 0; k < ((CommonMapping)commonMappingAssets[i]).partialNames.Count; k++) {
+					for (int k = 0; k < (commonMappingAssets[i]).partialNames.Count; k++) {
 						for (int g = 0; g < gamepads.Length; g++) {
-							if (gamepads[g].Contains(((CommonMapping)commonMappingAssets[i]).partialNames[k].ToUpper())) partialMatch = true;
+							if (gamepads[g].Contains((commonMappingAssets[i]).partialNames[k].ToUpper())) partialMatch = true;
 						}
 					}
 
-					if (gamepadConnected) commonMappings.Add((CommonMapping)commonMappingAssets[i]);
-					if (partialMatch && !gamepadConnected) commonMappings.Add((CommonMapping)commonMappingAssets[i]);
-					if (!partialMatch && !gamepadConnected && ((CommonMapping)commonMappingAssets[i]).isDefault) commonMappings.Add((CommonMapping)commonMappingAssets[i]);
+					if (gamepadConnected) commonMappings.Add(commonMappingAssets[i]);
+					if (partialMatch && !gamepadConnected) commonMappings.Add(commonMappingAssets[i]);
+					if (!partialMatch && !gamepadConnected && (commonMappingAssets[i]).isDefault) commonMappings.Add((CommonMapping)commonMappingAssets[i]);
 
-					if (((CommonMapping)commonMappingAssets[i]).isDefault) defaultMappingIndex = commonMappings.Count - 1;
+					if ((commonMappingAssets[i]).isDefault) defaultMappingIndex = commonMappings.Count - 1;
 				}
 			}
 

@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -20,11 +18,6 @@ namespace SinputSystems.Rebinding{
 		[HideInInspector]
 		public MouseInputType changedMouse = MouseInputType.None;
 
-
-		// Use this for initialization
-		void Start () {
-			
-		}
 
 		int mouseMovementMin = 50;
 		public void ResetMouseListening() {
@@ -57,7 +50,7 @@ namespace SinputSystems.Rebinding{
 
 
 			//keyboard check
-			foreach (KeyboardInputType keycode in Enum.GetValues(typeof(KeyboardInputType))) {
+			foreach (KeyboardInputType keycode in SInputEnums.KeyboardInputTypes) {
 				KeyCheck((KeyCode)Enum.Parse(typeof(KeyCode), keycode.ToString()));
 			}
 
@@ -66,19 +59,19 @@ namespace SinputSystems.Rebinding{
 
 			//mouse checks
 			if (AcceptChangesFromSlot(-1)) { 
-				mouseHorizontalTotal += Input.GetAxis("Mouse Horizontal");
-				mouseVerticalTotal += Input.GetAxis("Mouse Vertical");
-				mouseScrollTotal += Input.GetAxis("Mouse Scroll");
+				mouseHorizontalTotal += Input.GetAxisRaw("Mouse Horizontal");
+				mouseVerticalTotal += Input.GetAxisRaw("Mouse Vertical");
+				mouseScrollTotal += Input.GetAxisRaw("Mouse Scroll");
 				if (mouseHorizontalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveRight;
-				if (mouseHorizontalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveLeft;
+				else if (mouseHorizontalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveLeft;
 				if (mouseVerticalTotal > mouseMovementMin) changedMouse = MouseInputType.MouseMoveUp;
-				if (mouseVerticalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveDown;
+				else if (mouseVerticalTotal < -mouseMovementMin) changedMouse = MouseInputType.MouseMoveDown;
 				if (mouseScrollTotal >= 1) changedMouse = MouseInputType.MouseScrollUp;
-				if (mouseScrollTotal <= -1) changedMouse = MouseInputType.MouseScrollDown;
+				else if (mouseScrollTotal <= -1) changedMouse = MouseInputType.MouseScrollDown;
 				if (changedMouse != MouseInputType.None) changeFound = true;
 			}
 
-			foreach (MouseInputType mouseInput in Enum.GetValues(typeof(MouseInputType))){
+			foreach (MouseInputType mouseInput in SInputEnums.MouseInputTypes){
 				MouseCheck( mouseInput );
 			}
 
@@ -142,7 +135,7 @@ namespace SinputSystems.Rebinding{
 
 			for (int i=0; i<padCount; i++){
 				for (int a=0; a<allGamepadAxis[i].axisValues.Length; a++){
-					float presentValue = Input.GetAxisRaw("J_"+(i+1).ToString()+"_"+(a+1).ToString());
+					float presentValue = Input.GetAxisRaw(SInputEnums.GetAxisString(i, a));
 					if (AcceptChangesFromSlot(i+1) && allGamepadAxis[i].measuredFirstChange[a] && allGamepadAxis[i].axisValues[a] != presentValue){
 						float restingValue = 0f;
 						if (allGamepadAxis[i].zeroTime[a] >= allGamepadAxis[i].minusOneTime[a] && allGamepadAxis[i].zeroTime[a] >= allGamepadAxis[i].plusOneTime[a]){
@@ -228,7 +221,7 @@ namespace SinputSystems.Rebinding{
 				for (int a=0; a<allGamepadAxis[i].axisValues.Length; a++){
 					allGamepadAxis[i].measuredFirstChange[a]=false;
 
-					allGamepadAxis[i].axisValues[a] = Input.GetAxisRaw("J_"+(i+1).ToString()+"_"+(a+1).ToString());
+					allGamepadAxis[i].axisValues[a] = Input.GetAxisRaw(SInputEnums.GetAxisString(i, a));
 
 					allGamepadAxis[i].zeroTime[a] = 0f;
 					allGamepadAxis[i].plusOneTime[a] = 0f;
@@ -261,15 +254,9 @@ namespace SinputSystems.Rebinding{
 
 		void MouseCheck(MouseInputType m){
 			if (!AcceptChangesFromSlot(-1)) return;
-			bool change = false;
-			if (m == MouseInputType.Mouse0 && Input.GetKeyDown( KeyCode.Mouse0 )) change = true;
-			if (m == MouseInputType.Mouse1 && Input.GetKeyDown( KeyCode.Mouse1 )) change = true;
-			if (m == MouseInputType.Mouse2 && Input.GetKeyDown( KeyCode.Mouse2 )) change = true;
-			if (m == MouseInputType.Mouse3 && Input.GetKeyDown( KeyCode.Mouse3 )) change = true;
-			if (m == MouseInputType.Mouse4 && Input.GetKeyDown( KeyCode.Mouse4 )) change = true;
-			if (m == MouseInputType.Mouse5 && Input.GetKeyDown( KeyCode.Mouse5 )) change = true;
-			if (m == MouseInputType.Mouse6 && Input.GetKeyDown( KeyCode.Mouse6 )) change = true;
-			if (change){
+
+			KeyCode keyCode = KeyCode.Mouse0 + (m - MouseInputType.Mouse0);
+			if (Input.GetKeyDown(keyCode)) {
 				changeFound = true;
 				changedMouse = m;
 			}

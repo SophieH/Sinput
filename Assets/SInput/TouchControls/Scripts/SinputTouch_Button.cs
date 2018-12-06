@@ -1,4 +1,3 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -127,7 +126,7 @@ namespace SinputSystems.Touch {
 
 			//make it work with mouse for debug
 			if (debugMouse) {
-				if (Input.GetKey("mouse 0")) {
+				if (Input.GetKey(KeyCode.Mouse0)) {
 					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 					if (touchCollider) {
 						RaycastHit hit = new RaycastHit();

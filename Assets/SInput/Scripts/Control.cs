@@ -1,11 +1,13 @@
-﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems{
-	public class Control{
+	// If this class inherits from ScriptableObject, Instantiate of this easily makes a clone
+	public class Control : ISerializationCallbackReceiver {
 		//name of control
 		public string name;
+		public int nameHashed { get; private set; }
 
 		//is this control a hold or a toggle type
 		public bool isToggle = false;
@@ -20,11 +22,18 @@ namespace SinputSystems{
 		public Control(string controlName){
 			name = controlName;
 			inputs = new List<DeviceInput>();
+			Hash();
+		}
+
+		public void OnBeforeSerialize() { }
+		public void OnAfterDeserialize() { Hash(); }
+
+		public void Hash() {
+			nameHashed = Animator.StringToHash(name);
 		}
 
 		private ControlState[] controlStates;
 		//called no more than once a frame from Sinput.SinputUpdate
-		bool checkslot = false;
 		public void Update() {
 
 			if (null == controlStates) {
@@ -36,32 +45,19 @@ namespace SinputSystems{
 			}
 
 			//do update here
-			checkslot = false;
 			//int connectedGamepads = Sinput.gamepads.Length;
 			for (int i = 1; i < controlStates.Length; i++) {
-				checkslot = false;
-				if (i <= Sinput.connectedGamepads) checkslot = true; // slot represents a connected pad
-
-				if (i >= 17) checkslot = true; //slot represents keyboard,mouse, or virtual slot
+				// Check if slot represents any of this:
+				bool checkslot = i <= Sinput.connectedGamepads || // a connected pad?
+					i >= 17; // a keyboard, mouse, or virtual slot?
 
 				if (checkslot) {
 					//this is a (probably) connected device so lets update it
-					UpdateControlState(i, (InputDeviceSlot)i);
+					UpdateControlState(controlStates[i], (InputDeviceSlot)i);
 				} else {
 					//this device isn't connected & shouldn't be influencing this control
 					//reset it
-					controlStates[i].value = 0f;
-					controlStates[i].axisAsButtonHeld = false;
-					controlStates[i].held = false;
-					controlStates[i].released = false;
-					controlStates[i].pressed = false;
-					controlStates[i].repeatPressed = false;
-					controlStates[i].valuePrefersDeltaUse = true;
-					controlStates[i].holdTime = 0f;
-					controlStates[i].repeatTime = 0f;
-					controlStates[i].toggleHeld = false;
-					controlStates[i].togglePressed = false;
-					controlStates[i].toggleReleased = false;
+					controlStates[i].Reset();
 				}
 				
 			}
@@ -69,189 +65,115 @@ namespace SinputSystems{
 			//UpdateControlState(0, InputDeviceSlot.any);//checked other slots, now check the 'any' slot
 		}
 
-		float v;
-		bool wasHeld;
-		void UpdateControlState(int i, InputDeviceSlot slot) {
+		void UpdateControlState(ControlState controlState, InputDeviceSlot slot) {
+			var wasHeld = controlState.held;
+			controlState.held = false;
 
-			controlStates[i].value = 0f;
-			controlStates[i].valuePrefersDeltaUse = true;
-			controlStates[i].axisAsButtonHeld = false;
+			controlState.value = 0f;
+			controlState.valuePrefersDeltaUse = true;
 			
-			for (int inpt = 0; inpt < inputs.Count; inpt++) {
-				v = inputs[inpt].AxisCheck(slot);
+			foreach (var input in inputs) {
+				var v = input.AxisCheck(slot);
 
-				//update axis-as-button state
-				if (inputs[inpt].inputType == InputDeviceType.GamepadAxis) {
-					if (v > inputs[inpt].axisButtoncompareVal) controlStates[i].axisAsButtonHeld = true;
-				}
-				if (inputs[inpt].inputType == InputDeviceType.Mouse) {
-					if (Mathf.Abs(v) > 0.5f) controlStates[i].axisAsButtonHeld = true;
+				//update axis-as-button and button state (When checking axis we also check for button state)
+				switch (input.inputType) {
+					case InputDeviceType.GamepadAxis:
+						controlState.held |= v > input.axisButtoncompareVal;
+						break;
+					case InputDeviceType.Mouse:
+						controlState.held |= Math.Abs(v) > 0.5f;
+						break;
+					case InputDeviceType.Keyboard:
+					case InputDeviceType.GamepadButton:
+						controlState.held |= v == 1;
+						break;
+					case InputDeviceType.Virtual:
+						// Meh. Would be better to unify GetVirtualButton and GetVirtualAxis
+						controlState.held |= VirtualInputs.GetVirtualButton(input.virtualInputID);
+						break;
+					case InputDeviceType.XR:
+						// TO DO
+						break;
 				}
 
-				if (Mathf.Abs(v) > controlStates[i].value) {
+				if (Math.Abs(v) > Math.Abs(controlState.value)) {
 					//this is the value we're going with
-					controlStates[i].value = v;
+					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime
-					controlStates[i].valuePrefersDeltaUse = true;
-					if (inputs[inpt].inputType == InputDeviceType.Mouse) {
-						if (inputs[inpt].mouseInputType == MouseInputType.MouseMoveLeft || inputs[inpt].mouseInputType == MouseInputType.MouseMoveRight ||
-							inputs[inpt].mouseInputType == MouseInputType.MouseMoveUp || inputs[inpt].mouseInputType == MouseInputType.MouseMoveDown ||
-							inputs[inpt].mouseInputType == MouseInputType.MouseHorizontal || inputs[inpt].mouseInputType == MouseInputType.MouseVertical ||
-							inputs[inpt].mouseInputType == MouseInputType.MouseScrollUp || inputs[inpt].mouseInputType == MouseInputType.MouseScrollDown ||
-							inputs[inpt].mouseInputType == MouseInputType.MouseScroll) {
-							controlStates[i].valuePrefersDeltaUse = false;
-						}
-					}
+					controlState.valuePrefersDeltaUse =
+						input.inputType != InputDeviceType.Mouse ||
+						input.mouseInputType < MouseInputType.MouseMoveLeft ||
+						input.mouseInputType > MouseInputType.MouseScroll;
 				}
-			}
-			//controlStates[i].value = AxisCheck(slot, out controlStates[i].valuePrefersDeltaUse, out controlStates[i].axisAsButtonHeld);
 
-			//check if this control is held
-			wasHeld = controlStates[i].held;
-			controlStates[i].held = false;
-			for (int inpt = 0; inpt < inputs.Count; inpt++) {
-				if (inputs[inpt].ButtonHeldCheck(slot)) controlStates[i].held = true;
-			}
-			//controlStates[i].pressed = ButtonCheck(ButtonAction.DOWN, slot);
-			//controlStates[i].released = ButtonCheck(ButtonAction.UP, slot);
-
-			//held state
-			if (wasHeld) {
-				controlStates[i].pressed = false;
-				if (controlStates[i].axisAsButtonHeld || controlStates[i].held) {
-					controlStates[i].held = true;
-					controlStates[i].released = false;
-				} else {
-					controlStates[i].held = false;
-					controlStates[i].released = true;
-				}
-			} else {
-				controlStates[i].released = false;
-				if (controlStates[i].axisAsButtonHeld || controlStates[i].held) {
-					controlStates[i].held = true;
-					controlStates[i].pressed = true;
-
-				} else {
-					controlStates[i].held = false;
-					controlStates[i].pressed = false;
-				}
 			}
 
-			//toggled state
-			controlStates[i].toggleReleased = false;
-			controlStates[i].togglePressed = false;
-			if (controlStates[i].pressed) {
-				if (controlStates[i].toggleHeld) {
-					controlStates[i].toggleHeld = false;
-					controlStates[i].toggleReleased = true;
-				} else {
-					controlStates[i].toggleHeld = true;
-					controlStates[i].togglePressed = true;
-				}
-			}
-
-			
-			//repeating press state
-			controlStates[i].repeatPressed = false;
-			if (controlStates[i].pressed) controlStates[i].repeatPressed = true;//repeat press returns true on first frame down
-			if (controlStates[i].held) {
-				controlStates[i].holdTime += Time.deltaTime;
-				controlStates[i].repeatTime -= Time.deltaTime;
-				if (controlStates[i].holdTime>Sinput.buttonRepeatWait && controlStates[i].repeatTime < 0f) {
-					controlStates[i].repeatTime = Sinput.buttonRepeat;
-					controlStates[i].repeatPressed = true;
-				}
-			} else {
-				controlStates[i].holdTime = 0f;
-				controlStates[i].repeatTime = 0f;
-			}
+			UpdateButtonStates(controlState, wasHeld);
 		}
 
 		void UpdateAnyControlState() {
+			ControlState controlState = controlStates[0];
 
-			controlStates[0].value = 0f;
-			controlStates[0].axisAsButtonHeld = false;
+			var wasHeld = controlState.held;
+			controlState.held = false;
+
+			controlState.value = 0f;
 
 			for (int i = 1; i < controlStates.Length; i++) {
-				v = controlStates[i].value;
+				var v = controlStates[i].value;
 
-				if (Mathf.Abs(v) > controlStates[0].value) {
+				if (Math.Abs(v) > Math.Abs(controlState.value)) {
 					//this is the value we're going with
-					controlStates[0].value = v;
+					controlState.value = v;
 					//now find out if what set this value was something we shouldn't multiply by deltaTime
-					controlStates[0].valuePrefersDeltaUse = controlStates[i].valuePrefersDeltaUse;
+					controlState.valuePrefersDeltaUse = controlStates[i].valuePrefersDeltaUse;
 				}
+
+				//check if this control is held
+				controlState.held |= controlStates[i].held;
 			}
 
-			//check if this control is held
-			wasHeld = controlStates[0].held;
-			controlStates[0].held = false;
-			for (int i = 1; i < controlStates.Length; i++) {
-				if (controlStates[i].held) controlStates[0].held = true;
-			}
+			UpdateButtonStates(controlState, wasHeld);
+		}
+
+		private void UpdateButtonStates(ControlState controlState, bool wasHeld) {
 
 			//held state
-			if (wasHeld) {
-				controlStates[0].pressed = false;
-				if (controlStates[0].held) {
-					controlStates[0].released = false;
-				} else {
-					controlStates[0].released = true;
-				}
-			} else {
-				controlStates[0].released = false;
-				if (controlStates[0].held) {
-					controlStates[0].pressed = true;
-				} else {
-					controlStates[0].pressed = false;
-				}
-			}
+			controlState.pressed = !wasHeld && controlState.held;
+			controlState.released = wasHeld && !controlState.held;
 
 			//toggled state
-			controlStates[0].toggleReleased = false;
-			controlStates[0].togglePressed = false;
-			if (controlStates[0].pressed) {
-				if (controlStates[0].toggleHeld) {
-					controlStates[0].toggleHeld = false;
-					controlStates[0].toggleReleased = true;
-				} else {
-					controlStates[0].toggleHeld = true;
-					controlStates[0].togglePressed = true;
-				}
+			controlState.togglePressed = false;
+			controlState.toggleReleased = false;
+			if (controlState.pressed) {
+				controlState.toggleHeld = !controlState.toggleHeld;
+				controlState.togglePressed = controlState.toggleHeld;
+				controlState.toggleReleased = !controlState.toggleHeld;
 			}
-
 
 			//repeating press state
-			controlStates[0].repeatPressed = false;
-			if (controlStates[0].pressed) controlStates[0].repeatPressed = true;//repeat press returns true on first frame down
-			if (controlStates[0].held) {
-				controlStates[0].holdTime += Time.deltaTime;
-				controlStates[0].repeatTime -= Time.deltaTime;
-				if (controlStates[0].holdTime > Sinput.buttonRepeatWait && controlStates[0].repeatTime < 0f) {
-					controlStates[0].repeatTime = Sinput.buttonRepeat;
-					controlStates[0].repeatPressed = true;
-				}
-			} else {
-				controlStates[0].holdTime = 0f;
-				controlStates[0].repeatTime = 0f;
+			controlState.repeatPressed = false;
+			if (controlState.pressed) {
+				controlState.repeatPressed = true;//repeat press returns true on first frame down
+				controlState.repeatTime = Sinput.buttonRepeatWait + Sinput.buttonRepeat;
 			}
+			if (controlState.held) {
+				controlState.repeatTime -= Time.deltaTime;
+				if (controlState.repeatTime < 0f) {
+					controlState.repeatTime = Sinput.buttonRepeat;
+					controlState.repeatPressed = true;
+				}
+			}
+			else {
+				controlState.repeatTime = 0f;
+			}
+
 		}
 
 		public void ResetControlStates() {
 			//set all values for this control to 0
 			for (int i = 0; i < controlStates.Length; i++) {
-				controlStates[i].value = 0f;
-				controlStates[i].axisAsButtonHeld = false;
-				controlStates[i].held = false;
-				controlStates[i].released = false;
-				controlStates[i].pressed = false;
-				controlStates[i].repeatPressed = false;
-				controlStates[i].valuePrefersDeltaUse = true;
-				controlStates[i].holdTime = 0f;
-				controlStates[i].repeatTime = 0f;
-				controlStates[i].toggleHeld = false;
-				controlStates[i].togglePressed = false;
-				controlStates[i].toggleReleased = false;
+				controlStates[i].Reset();
 			}
 		}
 
@@ -278,7 +200,8 @@ namespace SinputSystems{
 	
 
 		//axis checks
-		public float GetAxisState(InputDeviceSlot slot) {
+		public float GetAxisState(InputDeviceSlot slot, out bool prefersDeltaUse) {
+			prefersDeltaUse = controlStates[(int)slot].valuePrefersDeltaUse;
 			return controlStates[(int)slot].value;
 		}
 		public bool GetAxisStateDeltaPreference(InputDeviceSlot slot) {
@@ -326,14 +249,14 @@ namespace SinputSystems{
 			//find which common mapped inputs apply here, but already have custom binding loaded, and disregard those common mappings
 			for (int ai=0; ai<applicableMapInputs.Count; ai++){
 				bool samePad = false;
-				for (int i=0; i<inputs.Count; i++){
-					if (inputs[i].inputType == InputDeviceType.GamepadAxis || inputs[i].inputType == InputDeviceType.GamepadButton){
-						if (inputs[i].isCustom){
+				foreach (var input in inputs){
+					if (input.inputType == InputDeviceType.GamepadAxis || input.inputType == InputDeviceType.GamepadButton){
+						if (input.isCustom){
 							for (int ais=0; ais<applicableMapInputs[ai].allowedSlots.Length; ais++){
-								for (int toomanyints=0; toomanyints<inputs[i].allowedSlots.Length; toomanyints++){
-									if (applicableMapInputs[ai].allowedSlots[ais] == inputs[i].allowedSlots[toomanyints]) samePad = true;
+								for (int toomanyints=0; toomanyints<input.allowedSlots.Length; toomanyints++){
+									if (applicableMapInputs[ai].allowedSlots[ais] == input.allowedSlots[toomanyints]) samePad = true;
 								}
-								if (gamepads[applicableMapInputs[ai].allowedSlots[ais]] == inputs[i].deviceName.ToUpper()) samePad = true;
+								if (gamepads[applicableMapInputs[ai].allowedSlots[ais]] == input.deviceName.ToUpper()) samePad = true;
 							}
 							if (samePad){
 								//if I wanna be copying input display names, here's the place to do it
@@ -425,7 +348,7 @@ namespace SinputSystems{
 				if (inputs[i].deviceName!=""){
 					List<int> allowedSlots = new List<int>();
 					for (int g=0; g<gamepads.Length; g++){
-						if (gamepads[g] == inputs[i].deviceName.ToUpper()) allowedSlots.Add(i);
+						if (gamepads[g] == inputs[i].deviceName.ToUpper()) allowedSlots.Add(g);
 					}
 					inputs[i].allowedSlots = allowedSlots.ToArray();
 				}
@@ -457,23 +380,34 @@ namespace SinputSystems{
 	//state of control, for a frame, for one slot
 	class ControlState {
 		//basic cacheing of all relevant inputs for this slot
-		public float value = 0f;
-		public bool axisAsButtonHeld = false;
-		public bool held = false;
-		public bool released = false;
-		public bool pressed = false;
+		public float value;
+		public bool held;
+		public bool released;
+		public bool pressed;
 
 		//for toggle checks
-		public bool toggleHeld = false;
-		public bool toggleReleased = false;
-		public bool togglePressed = false;
+		public bool toggleHeld;
+		public bool toggleReleased;
+		public bool togglePressed;
 
 		//for checking if the value is something that should be multiplied by deltaTime or not
 		public bool valuePrefersDeltaUse = true;
 
 		//for Sinput.ButtonPressRepeat() checks
-		public bool repeatPressed = false;
-		public float repeatTime = 0f;
-		public float holdTime = 0f;
+		public bool repeatPressed;
+		public float repeatTime;
+
+		public void Reset() {
+			value = 0f;
+			held = false;
+			released = false;
+			pressed = false;
+			repeatPressed = false;
+			valuePrefersDeltaUse = true;
+			repeatTime = 0f;
+			toggleHeld = false;
+			togglePressed = false;
+			toggleReleased = false;
+		}
 	}
 }

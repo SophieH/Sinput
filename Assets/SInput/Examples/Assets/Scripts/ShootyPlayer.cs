@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems.Examples{
@@ -79,22 +77,27 @@ namespace SinputSystems.Examples{
 
 			//shooting
 			bulletCooldown -= Time.deltaTime;
-			if (Sinput.GetButton("Fire1", playerSlot) && bulletCooldown <= 0f) {
-				bulletCooldown = 0.2f;
-				GameObject newBullet = (GameObject)GameObject.Instantiate(bulletPrefab);
-				newBullet.transform.position = gunTransform.position;
-				newBullet.transform.rotation = gunTransform.rotation;
-				newBullet.GetComponent<BulletScript>().moveDir = gunTransform.forward;
-			}
-			if (Sinput.GetButton("Fire2", playerSlot) && bulletCooldown <= 0f) {
-				bulletCooldown = 0.05f;
-				GameObject newBullet = (GameObject)GameObject.Instantiate(bulletPrefab);
-				newBullet.transform.position = gunTransform.position;
-				newBullet.transform.rotation = gunTransform.rotation;
-				newBullet.transform.localScale = Vector3.one * 0.3f;
-				newBullet.GetComponent<BulletScript>().moveDir = gunTransform.forward;
-				newBullet.GetComponent<BulletScript>().moveSpeed = 30f;
-				newBullet.GetComponent<BulletScript>().life = 0.33f;
+			if (bulletCooldown <= 0f) {
+				var fire1 = Sinput.GetButton("Fire1", playerSlot);
+				var fire2 = Sinput.GetButton("Fire2", playerSlot);
+
+				if (fire1) {
+					bulletCooldown = 0.2f;
+					GameObject newBullet = (GameObject) GameObject.Instantiate(bulletPrefab);
+					newBullet.transform.position = gunTransform.position;
+					newBullet.transform.rotation = gunTransform.rotation;
+					newBullet.GetComponent<BulletScript>().moveDir = gunTransform.forward;
+				}
+				if (fire2) {
+					bulletCooldown = 0.05f;
+					GameObject newBullet = (GameObject) GameObject.Instantiate(bulletPrefab);
+					newBullet.transform.position = gunTransform.position;
+					newBullet.transform.rotation = gunTransform.rotation;
+					newBullet.transform.localScale = Vector3.one * 0.3f;
+					newBullet.GetComponent<BulletScript>().moveDir = gunTransform.forward;
+					newBullet.GetComponent<BulletScript>().moveSpeed = 30f;
+					newBullet.GetComponent<BulletScript>().life = 0.33f;
+				}
 			}
 		}
 	}

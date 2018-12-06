@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SinputSystems.Touch {
@@ -60,7 +58,7 @@ namespace SinputSystems.Touch {
 				/*for (int i = 0; i < Input.touchCount; i++) {
 					if (Input.touches[i].fingerId == claimedTouch) stillExists = true;
 				}*/
-				if (debugMouse && claimedTouch == -2 && Input.GetKey("mouse 0")) stillExists = true;
+				if (debugMouse && claimedTouch == -2 && Input.GetKey(KeyCode.Mouse0)) stillExists = true;
 				if (!stillExists) claimedTouch = -1;
 			}
 
@@ -83,7 +81,7 @@ namespace SinputSystems.Touch {
 					}
 				}
 				
-				if (debugMouse && claimedTouch == -1 && Input.GetKeyDown("mouse 0")) {
+				if (debugMouse && claimedTouch == -1 && Input.GetKeyDown(KeyCode.Mouse0)) {
 					Vector3 hitPoint = Vector3.zero;
 					if (TouchCollision(Input.mousePosition, out hitPoint, !followTouch)) {
 						if (followTouch) {
