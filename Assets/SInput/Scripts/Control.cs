@@ -348,7 +348,7 @@ namespace SinputSystems{
 				if (inputs[i].deviceName!=""){
 					List<int> allowedSlots = new List<int>();
 					for (int g=0; g<gamepads.Length; g++){
-						if (gamepads[g] == inputs[i].deviceName.ToUpper()) allowedSlots.Add(i);
+						if (gamepads[g] == inputs[i].deviceName.ToUpper()) allowedSlots.Add(g);
 					}
 					inputs[i].allowedSlots = allowedSlots.ToArray();
 				}
