@@ -155,8 +155,8 @@ namespace SinputSystems{
 			controlStates[i].repeatPressed = false;
 			if (controlStates[i].pressed) controlStates[i].repeatPressed = true;//repeat press returns true on first frame down
 			if (controlStates[i].held) {
-				controlStates[i].holdTime += Time.deltaTime;
-				controlStates[i].repeatTime -= Time.deltaTime;
+				controlStates[i].holdTime += Time.unscaledDeltaTime;
+				controlStates[i].repeatTime -= Time.unscaledDeltaTime;
 				if (controlStates[i].holdTime>Sinput.buttonRepeatWait && controlStates[i].repeatTime < 0f) {
 					controlStates[i].repeatTime = Sinput.buttonRepeat;
 					controlStates[i].repeatPressed = true;
@@ -225,8 +225,8 @@ namespace SinputSystems{
 			controlStates[0].repeatPressed = false;
 			if (controlStates[0].pressed) controlStates[0].repeatPressed = true;//repeat press returns true on first frame down
 			if (controlStates[0].held) {
-				controlStates[0].holdTime += Time.deltaTime;
-				controlStates[0].repeatTime -= Time.deltaTime;
+				controlStates[0].holdTime += Time.unscaledDeltaTime;
+				controlStates[0].repeatTime -= Time.unscaledDeltaTime;
 				if (controlStates[0].holdTime > Sinput.buttonRepeatWait && controlStates[0].repeatTime < 0f) {
 					controlStates[0].repeatTime = Sinput.buttonRepeat;
 					controlStates[0].repeatPressed = true;
