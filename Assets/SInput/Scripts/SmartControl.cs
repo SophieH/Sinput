@@ -91,11 +91,11 @@ namespace SinputSystems{
 					if (gravity > 0f) {
 						if (rawValues[slot] == 0f || (rawValues[slot] < controlValues[slot] && controlValues[slot] > 0f) || (rawValues[slot] > controlValues[slot] && controlValues[slot] < 0f)) {
 							if (controlValues[slot] > 0f) {
-								controlValues[slot] -= gravity * Time.deltaTime;
+								controlValues[slot] -= gravity * Time.unscaledDeltaTime;
 								if (controlValues[slot] < 0f) controlValues[slot] = 0f;
 								if (controlValues[slot] < rawValues[slot]) controlValues[slot] = rawValues[slot];
 							} else if (controlValues[slot] < 0f) {
-								controlValues[slot] += gravity * Time.deltaTime;
+								controlValues[slot] += gravity * Time.unscaledDeltaTime;
 								if (controlValues[slot] > 0f) controlValues[slot] = 0f;
 								if (controlValues[slot] > rawValues[slot]) controlValues[slot] = rawValues[slot];
 							}
@@ -111,13 +111,13 @@ namespace SinputSystems{
 					//move value towards target value
 					if (rawValues[slot] < 0f) {
 						if (controlValues[slot] > rawValues[slot]) {
-							controlValues[slot] -= speed * Time.deltaTime;
+							controlValues[slot] -= speed * Time.unscaledDeltaTime;
 							if (controlValues[slot] < rawValues[slot]) controlValues[slot] = rawValues[slot];
 						}
 					}
 					if (rawValues[slot] > 0f) {
 						if (controlValues[slot] < rawValues[slot]) {
-							controlValues[slot] += speed * Time.deltaTime;
+							controlValues[slot] += speed * Time.unscaledDeltaTime;
 							if (controlValues[slot] > rawValues[slot]) controlValues[slot] = rawValues[slot];
 						}
 					}

@@ -91,7 +91,7 @@ namespace SinputSystems {
 					//check for partial name matches with this gamepad slot
 					for (int i = 0; i < commonMappings.Count; i++) {
 						for (int k = 0; k < commonMappings[i].partialNames.Count; k++) {
-							if (!mappingMatch && gamepads[g].Contains(commonMappings[i].partialNames[k])) {
+							if (!mappingMatch && gamepads[g].Contains(commonMappings[i].partialNames[k].ToUpper())) {
 								mappingMatch = true;
 								mappingSlots[i].slots.Add(g);
 							}
