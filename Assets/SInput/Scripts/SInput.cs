@@ -250,7 +250,7 @@ public static class Sinput {
 		//count down till we can stop zeroing inputs
 		for (int i = 0; i < _totalPossibleDeviceSlots; i++) {
 			if (zeroInputs[i]) {
-				zeroInputWaits[i] -= Time.deltaTime;
+				zeroInputWaits[i] -= Time.unscaledDeltaTime;
 				if (zeroInputWaits[i] <= 0f) zeroInputs[i] = false;
 			}
 		}
